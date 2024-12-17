@@ -1,6 +1,6 @@
 ﻿#include "PMXText.h"
 
-void PMX::Text::FromBytes(PMX::Byte* const InBuffer, const PMX::Size_T InBufferSize, const PMX::EncodingType InEncoding)
+void PMX::Text::FromBytes(PMX::Byte* const InBuffer, const size_t InBufferSize, const PMX::EncodingType InEncoding)
 {
     Encoding = InEncoding;
 
@@ -8,11 +8,11 @@ void PMX::Text::FromBytes(PMX::Byte* const InBuffer, const PMX::Size_T InBufferS
     {
         case EncodingType::UTF16LE:
             TextData.UTF16LE = reinterpret_cast<wchar_t*>(InBuffer);
-            Length = InBufferSize / 2;
+            Length = static_cast<int>(InBufferSize / 2);
             break;
         case EncodingType::UTF8:
             TextData.UTF8 = reinterpret_cast<char*>(InBuffer);
-            Length = InBufferSize / 3;
+            Length = static_cast<int>(InBufferSize / 3);
             break;
         default:
             return;
@@ -42,7 +42,7 @@ PMX::EncodingType PMX::Text::GetEncodingType()
     return Encoding;
 }
 
-PMX::Size_T PMX::Text::GetBufferSize()
+size_t PMX::Text::GetBufferSize()
 {
     switch (Encoding)
     {

@@ -9,16 +9,16 @@
 class PMXMeshData
 {
 public:
-    bool LoadBinary(const PMX::Byte* const Buffer, const PMX::Size_T BufferSize);
+    bool LoadBinary(const PMX::Byte* const Buffer, const size_t BufferSize);
     void Delete();
 
 protected:
-    static PMX::Size_T ReadBuffer(void* OutDest, const PMX::Byte* const InBuffer, const PMX::Size_T ReadSize);
-    static PMX::Size_T ReadText(PMX::Text& OutString, const PMX::Byte* InBuffer, const PMX::EncodingType Encoding);
+    static size_t ReadBuffer(void* OutDest, const PMX::Byte* const InBuffer, const size_t ReadSize);
+    static size_t ReadText(PMX::Text& OutString, const PMX::Byte* InBuffer, const PMX::EncodingType Encoding);
 
-    PMX::Size_T ReadHeader(const PMX::Byte* const InBuffer);
-    PMX::Size_T ReadModelInfo(const PMX::Byte* const InBuffer);
-    PMX::Size_T ReadVertex(PMX::Vertex& OutVertex, const PMX::Byte* InBuffer, const PMX::Byte InAdditionalVectorCount, const PMX::Byte InWeightIndexSize);
+    size_t ReadHeader(const PMX::Byte* const InBuffer);
+    size_t ReadModelInfo(const PMX::Byte* const InBuffer);
+    size_t ReadVertex(PMX::Vertex& OutVertex, const PMX::Byte* InBuffer, const PMX::Byte InAdditionalVectorCount, const PMX::Byte InWeightIndexSize);
 
 protected:
     PMX::Header Header = { 0, };

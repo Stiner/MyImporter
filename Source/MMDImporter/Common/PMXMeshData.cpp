@@ -3,7 +3,7 @@
 #include <memory>
 #include <cassert>
 
-bool PMXMeshData::LoadBinary(const PMX::Byte* const InBuffer, const PMX::Size_T InBufferSize)
+bool PMXMeshData::LoadBinary(const PMX::Byte* const InBuffer, const size_t InBufferSize)
 {
     if (InBuffer == nullptr || InBufferSize == 0)
         return false;
@@ -67,13 +67,13 @@ void PMXMeshData::Delete()
 
 }
 
-PMX::Size_T PMXMeshData::ReadBuffer(void* OutDest, const PMX::Byte* const InBuffer, const PMX::Size_T ReadSize)
+size_t PMXMeshData::ReadBuffer(void* OutDest, const PMX::Byte* const InBuffer, const size_t ReadSize)
 {
     memcpy(OutDest, InBuffer, ReadSize);
     return ReadSize;
 }
 
-PMX::Size_T PMXMeshData::ReadText(PMX::Text& OutString, const PMX::Byte* InBuffer, const PMX::EncodingType InEncoding)
+size_t PMXMeshData::ReadText(PMX::Text& OutString, const PMX::Byte* InBuffer, const PMX::EncodingType InEncoding)
 {
     const PMX::Byte* BufferCur = InBuffer;
 
@@ -105,7 +105,7 @@ PMX::Size_T PMXMeshData::ReadText(PMX::Text& OutString, const PMX::Byte* InBuffe
     return BufferCur - InBuffer;
 }
 
-PMX::Size_T PMXMeshData::ReadHeader(const PMX::Byte* const InBuffer)
+size_t PMXMeshData::ReadHeader(const PMX::Byte* const InBuffer)
 {
     const PMX::Byte* BufferCur = InBuffer;
 
@@ -120,7 +120,7 @@ PMX::Size_T PMXMeshData::ReadHeader(const PMX::Byte* const InBuffer)
     return BufferCur - InBuffer;
 }
 
-PMX::Size_T PMXMeshData::ReadModelInfo(const PMX::Byte* const InBuffer)
+size_t PMXMeshData::ReadModelInfo(const PMX::Byte* const InBuffer)
 {
     const PMX::Byte* BufferCur = InBuffer;
 
@@ -132,7 +132,7 @@ PMX::Size_T PMXMeshData::ReadModelInfo(const PMX::Byte* const InBuffer)
     return BufferCur - InBuffer;
 }
 
-PMX::Size_T PMXMeshData::ReadVertex(PMX::Vertex& OutVertex, const PMX::Byte* InBuffer, const PMX::Byte InAdditionalVectorCount, const PMX::Byte InWeightIndexSize)
+size_t PMXMeshData::ReadVertex(PMX::Vertex& OutVertex, const PMX::Byte* InBuffer, const PMX::Byte InAdditionalVectorCount, const PMX::Byte InWeightIndexSize)
 {
     memset(&OutVertex, 0, sizeof(PMX::Vertex));
 

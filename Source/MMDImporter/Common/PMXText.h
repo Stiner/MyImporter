@@ -13,7 +13,7 @@ namespace PMX
     struct Text
     {
     public:
-        void FromBytes(PMX::Byte* const InBuffer, const PMX::Size_T InBufferSize, const PMX::EncodingType InEncoding);
+        void FromBytes(PMX::Byte* const InBuffer, const size_t InBufferSize, const PMX::EncodingType InEncoding);
         void Delete();
 
         PMX::EncodingType GetEncodingType();
@@ -23,10 +23,10 @@ namespace PMX
         int GetLength();
 
         // Null 끝을 포함한 메모리 크기
-        PMX::Size_T GetBufferSize();
+        size_t GetBufferSize();
 
     protected:
-        __int64 Length;
+        int Length;
 
         PMX::EncodingType Encoding;
 
