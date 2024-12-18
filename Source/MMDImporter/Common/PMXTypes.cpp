@@ -1,4 +1,4 @@
-﻿#include "PMXText.h"
+﻿#include "PMXTypes.h"
 
 void PMX::Text::FromBytes(PMX::Byte* const InBuffer, const size_t InBufferSize, const PMX::EncodingType InEncoding)
 {
