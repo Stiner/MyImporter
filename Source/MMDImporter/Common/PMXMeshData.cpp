@@ -18,7 +18,7 @@ bool PMXMeshData::LoadBinary(const PMX::Byte* const InBuffer, const size_t InBuf
     BufferCur += ReadModelInfo(BufferCur);
 
     BufferCur += ReadBuffer(&VertexCount, BufferCur, sizeof(VertexCount));
-    Vertices = new PMX::Vertex[VertexCount];
+    Vertices = new PMX::Vertex[VertexCount]{ 0 };
     for (int i = 0; i < VertexCount; ++i)
     {
         BufferCur += ReadVertex(Vertices[i], BufferCur, Header.AdditionalVectorCount, Header.VertexIndexSize);
@@ -42,7 +42,7 @@ void PMXMeshData::Delete()
     ModelInfo.Delete();
 
     if (Vertices != nullptr)
-        delete Vertices;
+        delete[] Vertices;
     Vertices = nullptr;
 
     VertexCount = 0;
