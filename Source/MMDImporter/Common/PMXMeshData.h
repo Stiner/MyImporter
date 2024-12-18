@@ -15,7 +15,7 @@ protected:
     size_t ReadBuffer(void* OutDest, const PMX::Byte* const InBuffer, const size_t ReadSize);
     size_t ReadText(PMX::Text& OutString, const PMX::Byte* InBuffer);
 
-    bool IsValidPMXFile(const PMX::Header& const Header);
+    bool IsValidPMXFile(const PMX::Header& Header);
 
     size_t ReadHeader(const PMX::Byte* const InBuffer);
     size_t ReadModelInfo(const PMX::Byte* const InBuffer);
@@ -37,32 +37,32 @@ protected:
     PMX::ModelInfo ModelInfo;
 
     int VertexCount;
-    PMX::VertexData* Vertices;
+    PMX::VertexData* Vertices = nullptr;
 
     int SurfaceCount;
-    PMX::SurfaceData* Surfaces;
+    PMX::SurfaceData* Surfaces = nullptr;
 
     int TextureCount;
-    PMX::TextureData* Textures;
+    PMX::TextureData* Textures = nullptr;
 
     int MaterialCount;
-    PMX::MaterialData* Materials;
+    PMX::MaterialData* Materials = nullptr;
 
     int BoneCount;
-    PMX::BoneData* Bones;
+    PMX::BoneData* Bones = nullptr;
 
     int MorphCount;
-    PMX::MorphData* Morphs;
+    PMX::MorphData* Morphs = nullptr;
 
     int DisplayFrameCount;
-    PMX::DisplayFrameData* DisplayFrames;
+    PMX::DisplayFrameData* DisplayFrames = nullptr;
 
     int RigidbodyCount;
-    PMX::RigidbodyData* Rigidbodies;
+    PMX::RigidbodyData* Rigidbodies = nullptr;
 
     int JointCount;
-    PMX::JointData* Joints;
+    PMX::JointData* Joints = nullptr;
 
     int SoftBodyCount;
-    PMX::SoftBodyData* SoftBodies;
+    PMX::SoftBodyData* SoftBodies = nullptr;
 };

@@ -108,7 +108,7 @@ size_t PMXMeshData::ReadText(PMX::Text& OutString, const PMX::Byte* InBuffer)
     return BufferCur - InBuffer;
 }
 
-bool PMXMeshData::IsValidPMXFile(const PMX::Header& const Header)
+bool PMXMeshData::IsValidPMXFile(const PMX::Header& Header)
 {
     return (Header.Signature[0] == 'P' && Header.Signature[1] == 'M' && Header.Signature[2] == 'X' && Header.Signature[3] == 0x20);
 }
