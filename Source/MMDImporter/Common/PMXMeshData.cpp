@@ -1,4 +1,5 @@
 ﻿#include "PMXMeshData.h"
+#include "PMXDefines.h"
 
 #include <memory>
 #include <cassert>
@@ -12,20 +13,16 @@ bool PMXMeshData::LoadBinary(const PMX::Byte* const InBuffer, const size_t InBuf
 
     BufferCur += ReadHeader(BufferCur);
 
-    if ((Header.Signature[0] == 'P' && Header.Signature[1] == 'M' && Header.Signature[2] == 'X') == false)
+    if (IsValidPMXFile(Header) == false)
         return false;
 
     BufferCur += ReadModelInfo(BufferCur);
 
-    BufferCur += ReadBuffer(&VertexCount, BufferCur, sizeof(VertexCount));
-    Vertices = new PMX::Vertex[VertexCount]{ 0 };
-    for (int i = 0; i < VertexCount; ++i)
-    {
-        BufferCur += ReadVertex(Vertices[i], BufferCur, Header.AdditionalVectorCount, Header.VertexIndexSize);
-    }
+    BufferCur += ReadVertices(BufferCur);
 
-    // TODO : 나머지 것들 로드
+    BufferCur += ReadSurfaces(BufferCur);
 
+    BufferCur += ReadTextures(BufferCur);
 
     // 지금까지 잘 로드 했는지 검사
     if (InBuffer != BufferCur - InBufferSize)
@@ -41,30 +38,35 @@ void PMXMeshData::Delete()
 {
     ModelInfo.Delete();
 
-    if (Vertices != nullptr)
-        delete[] Vertices;
-    Vertices = nullptr;
-
+    PMX_SAFE_DELETE_ARRAY(Vertices);
     VertexCount = 0;
 
+    PMX_SAFE_DELETE_ARRAY(Surfaces);
     SurfaceCount = 0;
 
+    PMX_SAFE_DELETE_ARRAY(Textures);
     TextureCount = 0;
 
+    PMX_SAFE_DELETE_ARRAY(Materials);
     MaterialCount = 0;
 
+    PMX_SAFE_DELETE_ARRAY(Bones);
     BoneCount = 0;
 
+    PMX_SAFE_DELETE_ARRAY(Morphs);
     MorphCount = 0;
 
-    DisplayframeCount = 0;
+    PMX_SAFE_DELETE_ARRAY(DisplayFrames);
+    DisplayFrameCount = 0;
 
+    PMX_SAFE_DELETE_ARRAY(Rigidbodies);
     RigidbodyCount = 0;
 
+    PMX_SAFE_DELETE_ARRAY(Joints);
     JointCount = 0;
 
+    PMX_SAFE_DELETE_ARRAY(SoftBodies);
     SoftBodyCount = 0;
-
 }
 
 size_t PMXMeshData::ReadBuffer(void* OutDest, const PMX::Byte* const InBuffer, const size_t ReadSize)
@@ -73,17 +75,18 @@ size_t PMXMeshData::ReadBuffer(void* OutDest, const PMX::Byte* const InBuffer, c
     return ReadSize;
 }
 
-size_t PMXMeshData::ReadText(PMX::Text& OutString, const PMX::Byte* InBuffer, const PMX::EncodingType InEncoding)
+size_t PMXMeshData::ReadText(PMX::Text& OutString, const PMX::Byte* InBuffer)
 {
     const PMX::Byte* BufferCur = InBuffer;
+    const PMX::EncodingType Encoding = Header.TextEncoding;
 
     OutString.Delete();
 
     int TextBytesSize = 0;
-    int TextBytesSizeWithNull = 0;
     BufferCur += ReadBuffer(&TextBytesSize, BufferCur, sizeof(TextBytesSize));
 
-    switch (InEncoding)
+    int TextBytesSizeWithNull = 0;
+    switch (Encoding)
     {
         case PMX::EncodingType::UTF16LE:
             TextBytesSizeWithNull = TextBytesSize + 2;
@@ -100,9 +103,14 @@ size_t PMXMeshData::ReadText(PMX::Text& OutString, const PMX::Byte* InBuffer, co
     PMX::Byte* TextBuffer = new PMX::Byte[TextBytesSizeWithNull]{ 0 };
     BufferCur += ReadBuffer(TextBuffer, BufferCur, sizeof(PMX::Byte) * TextBytesSize);
 
-    OutString.FromBytes(TextBuffer, TextBytesSize, InEncoding);
+    OutString.SetText(TextBuffer, TextBytesSize, Encoding);
 
     return BufferCur - InBuffer;
+}
+
+bool PMXMeshData::IsValidPMXFile(const PMX::Header& const Header)
+{
+    return (Header.Signature[0] == 'P' && Header.Signature[1] == 'M' && Header.Signature[2] == 'X' && Header.Signature[3] == 0x20);
 }
 
 size_t PMXMeshData::ReadHeader(const PMX::Byte* const InBuffer)
@@ -124,69 +132,85 @@ size_t PMXMeshData::ReadModelInfo(const PMX::Byte* const InBuffer)
 {
     const PMX::Byte* BufferCur = InBuffer;
 
-    BufferCur += ReadText(ModelInfo.ModelNameLocal, BufferCur, Header.TextEncoding);
-    BufferCur += ReadText(ModelInfo.ModelNameUniversal, BufferCur, Header.TextEncoding);
-    BufferCur += ReadText(ModelInfo.CommentsLocal, BufferCur, Header.TextEncoding);
-    BufferCur += ReadText(ModelInfo.CommentsUniversal, BufferCur, Header.TextEncoding);
+    BufferCur += ReadText(ModelInfo.ModelNameLocal,     BufferCur);
+    BufferCur += ReadText(ModelInfo.ModelNameUniversal, BufferCur);
+    BufferCur += ReadText(ModelInfo.CommentsLocal,      BufferCur);
+    BufferCur += ReadText(ModelInfo.CommentsUniversal,  BufferCur);
 
     return BufferCur - InBuffer;
 }
 
-size_t PMXMeshData::ReadVertex(PMX::Vertex& OutVertex, const PMX::Byte* InBuffer, const PMX::Byte InAdditionalVectorCount, const PMX::Byte InWeightIndexSize)
+size_t PMXMeshData::ReadVertices(const PMX::Byte* InBuffer)
 {
-    memset(&OutVertex, 0, sizeof(PMX::Vertex));
-
     const PMX::Byte* BufferCur = InBuffer;
 
-    BufferCur += ReadBuffer(&OutVertex.Position, BufferCur, sizeof(OutVertex.Position));
-    BufferCur += ReadBuffer(&OutVertex.Normal, BufferCur, sizeof(OutVertex.Normal));
-    BufferCur += ReadBuffer(&OutVertex.UV, BufferCur, sizeof(OutVertex.UV));
+    BufferCur += ReadBuffer(&VertexCount, BufferCur, sizeof(VertexCount));
 
-    BufferCur += ReadBuffer(OutVertex.Additional, BufferCur, sizeof(OutVertex.Additional[0]) * InAdditionalVectorCount);
+    if (VertexCount <= 0)
+        return 0;
 
-    BufferCur += ReadBuffer(&OutVertex.WeightDeformType, BufferCur, sizeof(OutVertex.WeightDeformType));
+    Vertices = new PMX::VertexData[VertexCount]{ 0 };
+
+    for (int i = 0; i < VertexCount; ++i)
     {
-        switch (OutVertex.WeightDeformType)
+        PMX::VertexData& Vertex = Vertices[i];
+
+        const PMX::Byte AdditionalVectorCount = Header.AdditionalVectorCount;
+        const PMX::Byte BoneIndexSize         = Header.BoneIndexSize;
+
+        BufferCur += ReadBuffer(&Vertex.Position, BufferCur, sizeof(Vertex.Position));
+        BufferCur += ReadBuffer(&Vertex.Normal,   BufferCur, sizeof(Vertex.Normal));
+        BufferCur += ReadBuffer(&Vertex.UV,       BufferCur, sizeof(Vertex.UV));
+
+        BufferCur += ReadBuffer(Vertex.Additional, BufferCur, sizeof(Vertex.Additional[0]) * AdditionalVectorCount);
+
+        BufferCur += ReadBuffer(&Vertex.WeightDeformType, BufferCur, sizeof(Vertex.WeightDeformType));
+
+        switch (Vertex.WeightDeformType)
         {
             case PMX::WeightDeformType::BDEF1:
                 {
-                    auto& WeightDeform = OutVertex.WeightDeform.BDef1;
+                    auto& WeightDeform = Vertex.WeightDeform.BDef1;
 
-                    BufferCur += ReadBuffer(&WeightDeform.Index, BufferCur, sizeof(PMX::Byte) * InWeightIndexSize);
+                    BufferCur += ReadBuffer(&WeightDeform.Index0, BufferCur, sizeof(PMX::Byte) * BoneIndexSize);
                 }
                 break;
             case PMX::WeightDeformType::BDEF2:
                 {
-                    auto& WeightDeform = OutVertex.WeightDeform.BDef2;
+                    auto& WeightDeform = Vertex.WeightDeform.BDef2;
 
-                    BufferCur += ReadBuffer(&WeightDeform.Index1, BufferCur, sizeof(PMX::Byte) * InWeightIndexSize);
-                    BufferCur += ReadBuffer(&WeightDeform.Index2, BufferCur, sizeof(PMX::Byte) * InWeightIndexSize);
-                    BufferCur += ReadBuffer(&WeightDeform.Weight1, BufferCur, sizeof(WeightDeform.Weight1));
-                    WeightDeform.Weight2 = 1.0f - WeightDeform.Weight1;
+                    BufferCur += ReadBuffer(&WeightDeform.Index0, BufferCur, sizeof(PMX::Byte) * BoneIndexSize);
+                    BufferCur += ReadBuffer(&WeightDeform.Index1, BufferCur, sizeof(PMX::Byte) * BoneIndexSize);
+
+                    BufferCur += ReadBuffer(&WeightDeform.Weight0, BufferCur, sizeof(WeightDeform.Weight0));
+                    WeightDeform.Weight1 = 1.0f - WeightDeform.Weight0;
                 }
                 break;
             case PMX::WeightDeformType::BDEF4:
                 {
-                    auto& WeightDeform = OutVertex.WeightDeform.BDef4;
+                    auto& WeightDeform = Vertex.WeightDeform.BDef4;
 
-                    BufferCur += ReadBuffer(&WeightDeform.Index1, BufferCur, sizeof(PMX::Byte) * InWeightIndexSize);
-                    BufferCur += ReadBuffer(&WeightDeform.Index2, BufferCur, sizeof(PMX::Byte) * InWeightIndexSize);
-                    BufferCur += ReadBuffer(&WeightDeform.Index3, BufferCur, sizeof(PMX::Byte) * InWeightIndexSize);
-                    BufferCur += ReadBuffer(&WeightDeform.Index4, BufferCur, sizeof(PMX::Byte) * InWeightIndexSize);
+                    BufferCur += ReadBuffer(&WeightDeform.Index0, BufferCur, sizeof(PMX::Byte) * BoneIndexSize);
+                    BufferCur += ReadBuffer(&WeightDeform.Index1, BufferCur, sizeof(PMX::Byte) * BoneIndexSize);
+                    BufferCur += ReadBuffer(&WeightDeform.Index2, BufferCur, sizeof(PMX::Byte) * BoneIndexSize);
+                    BufferCur += ReadBuffer(&WeightDeform.Index3, BufferCur, sizeof(PMX::Byte) * BoneIndexSize);
+
+                    BufferCur += ReadBuffer(&WeightDeform.Weight0, BufferCur, sizeof(WeightDeform.Weight0));
                     BufferCur += ReadBuffer(&WeightDeform.Weight1, BufferCur, sizeof(WeightDeform.Weight1));
                     BufferCur += ReadBuffer(&WeightDeform.Weight2, BufferCur, sizeof(WeightDeform.Weight2));
                     BufferCur += ReadBuffer(&WeightDeform.Weight3, BufferCur, sizeof(WeightDeform.Weight3));
-                    BufferCur += ReadBuffer(&WeightDeform.Weight4, BufferCur, sizeof(WeightDeform.Weight4));
                 }
                 break;
             case PMX::WeightDeformType::SDEF:
                 {
-                    auto& WeightDeform = OutVertex.WeightDeform.SDef;
+                    auto& WeightDeform = Vertex.WeightDeform.SDef;
 
-                    BufferCur += ReadBuffer(&WeightDeform.Index1, BufferCur, sizeof(PMX::Byte) * InWeightIndexSize);
-                    BufferCur += ReadBuffer(&WeightDeform.Index2, BufferCur, sizeof(PMX::Byte) * InWeightIndexSize);
-                    BufferCur += ReadBuffer(&WeightDeform.Weight1, BufferCur, sizeof(WeightDeform.Weight1));
-                    WeightDeform.Weight2 = 1.0f - WeightDeform.Weight1;
+                    BufferCur += ReadBuffer(&WeightDeform.Index0, BufferCur, sizeof(PMX::Byte) * BoneIndexSize);
+                    BufferCur += ReadBuffer(&WeightDeform.Index1, BufferCur, sizeof(PMX::Byte) * BoneIndexSize);
+
+                    BufferCur += ReadBuffer(&WeightDeform.Weight0, BufferCur, sizeof(WeightDeform.Weight0));
+                    WeightDeform.Weight1 = 1.0f - WeightDeform.Weight0;
+
                     BufferCur += ReadBuffer(&WeightDeform.C, BufferCur, sizeof(WeightDeform.C));
                     BufferCur += ReadBuffer(&WeightDeform.R0, BufferCur, sizeof(WeightDeform.R0));
                     BufferCur += ReadBuffer(&WeightDeform.R1, BufferCur, sizeof(WeightDeform.R1));
@@ -194,16 +218,17 @@ size_t PMXMeshData::ReadVertex(PMX::Vertex& OutVertex, const PMX::Byte* InBuffer
                 break;
             case PMX::WeightDeformType::QDEF:
                 {
-                    auto& WeightDeform = OutVertex.WeightDeform.QDef;
+                    auto& WeightDeform = Vertex.WeightDeform.QDef;
 
-                    BufferCur += ReadBuffer(&WeightDeform.Index1, BufferCur, sizeof(PMX::Byte) * InWeightIndexSize);
-                    BufferCur += ReadBuffer(&WeightDeform.Index2, BufferCur, sizeof(PMX::Byte) * InWeightIndexSize);
-                    BufferCur += ReadBuffer(&WeightDeform.Index3, BufferCur, sizeof(PMX::Byte) * InWeightIndexSize);
-                    BufferCur += ReadBuffer(&WeightDeform.Index4, BufferCur, sizeof(PMX::Byte) * InWeightIndexSize);
+                    BufferCur += ReadBuffer(&WeightDeform.Index0, BufferCur, sizeof(PMX::Byte) * BoneIndexSize);
+                    BufferCur += ReadBuffer(&WeightDeform.Index1, BufferCur, sizeof(PMX::Byte) * BoneIndexSize);
+                    BufferCur += ReadBuffer(&WeightDeform.Index2, BufferCur, sizeof(PMX::Byte) * BoneIndexSize);
+                    BufferCur += ReadBuffer(&WeightDeform.Index3, BufferCur, sizeof(PMX::Byte) * BoneIndexSize);
+
+                    BufferCur += ReadBuffer(&WeightDeform.Weight0, BufferCur, sizeof(WeightDeform.Weight0));
                     BufferCur += ReadBuffer(&WeightDeform.Weight1, BufferCur, sizeof(WeightDeform.Weight1));
                     BufferCur += ReadBuffer(&WeightDeform.Weight2, BufferCur, sizeof(WeightDeform.Weight2));
                     BufferCur += ReadBuffer(&WeightDeform.Weight3, BufferCur, sizeof(WeightDeform.Weight3));
-                    BufferCur += ReadBuffer(&WeightDeform.Weight4, BufferCur, sizeof(WeightDeform.Weight4));
                 }
                 break;
 
@@ -211,10 +236,90 @@ size_t PMXMeshData::ReadVertex(PMX::Vertex& OutVertex, const PMX::Byte* InBuffer
                 assert(0);
                 break;
         }
-    }
 
-    BufferCur += ReadBuffer(&OutVertex.EdgeScale, BufferCur, sizeof(OutVertex.EdgeScale));
+        BufferCur += ReadBuffer(&Vertex.EdgeScale, BufferCur, sizeof(Vertex.EdgeScale));
+    }
 
     return BufferCur - InBuffer;
 }
 
+size_t PMXMeshData::ReadSurfaces(const PMX::Byte* InBuffer)
+{
+    const PMX::Byte* BufferCur = InBuffer;
+    const int VertexIndexSize = Header.VertexIndexSize;
+
+    int IndexCount = 0;
+    BufferCur += ReadBuffer(&IndexCount, BufferCur, sizeof(IndexCount));
+
+    if (IndexCount <= 0)
+        return 0;
+
+    // 3개로 하나의 삼각형 구성
+    SurfaceCount = IndexCount / 3;
+
+    Surfaces = new PMX::SurfaceData[SurfaceCount]{ 0 };
+
+    for (int i = 0; i < SurfaceCount; ++i)
+    {
+        BufferCur += ReadBuffer(&Surfaces[i].VertexIndex[0], BufferCur, sizeof(PMX::Byte) * VertexIndexSize);
+        BufferCur += ReadBuffer(&Surfaces[i].VertexIndex[1], BufferCur, sizeof(PMX::Byte) * VertexIndexSize);
+        BufferCur += ReadBuffer(&Surfaces[i].VertexIndex[2], BufferCur, sizeof(PMX::Byte) * VertexIndexSize);
+    }
+
+    return BufferCur - InBuffer;
+}
+
+size_t PMXMeshData::ReadTextures(const PMX::Byte* InBuffer)
+{
+    const PMX::Byte* BufferCur = InBuffer;
+
+    BufferCur += ReadBuffer(&TextureCount, BufferCur, sizeof(TextureCount));
+
+    if (TextureCount <= 0)
+        return 0;
+
+    Textures = new PMX::TextureData[TextureCount];
+    memset(Textures, 0, sizeof(PMX::TextureData) * TextureCount);
+
+    for (int i = 0; i < TextureCount; ++i)
+    {
+        BufferCur += ReadText(Textures[i].Path, BufferCur);
+    }
+
+    return BufferCur - InBuffer;
+}
+
+size_t PMXMeshData::ReadMaterials(const PMX::Byte* InBuffer)
+{
+    return size_t();
+}
+
+size_t PMXMeshData::ReadBones(const PMX::Byte* InBuffer)
+{
+    return size_t();
+}
+
+size_t PMXMeshData::ReadMorphs(const PMX::Byte* InBuffer)
+{
+    return size_t();
+}
+
+size_t PMXMeshData::ReadDisplayFrames(const PMX::Byte* InBuffer)
+{
+    return size_t();
+}
+
+size_t PMXMeshData::ReadRigidbodies(const PMX::Byte* InBuffer)
+{
+    return size_t();
+}
+
+size_t PMXMeshData::ReadJoints(const PMX::Byte* InBuffer)
+{
+    return size_t();
+}
+
+size_t PMXMeshData::ReadSoftBodies(const PMX::Byte* InBuffer)
+{
+    return size_t();
+}

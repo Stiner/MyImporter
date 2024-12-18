@@ -1,6 +1,6 @@
 ﻿#include "PMXTypes.h"
 
-void PMX::Text::FromBytes(PMX::Byte* const InBuffer, const size_t InBufferSize, const PMX::EncodingType InEncoding)
+void PMX::Text::SetText(PMX::Byte* const InBuffer, const size_t InBufferSize, const PMX::EncodingType InEncoding)
 {
     Encoding = InEncoding;
 

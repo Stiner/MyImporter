@@ -34,7 +34,7 @@ namespace PMX
     struct Text
     {
     public:
-        void FromBytes(PMX::Byte* const InBuffer, const size_t InBufferSize, const PMX::EncodingType InEncoding);
+        void SetText(PMX::Byte* const InBuffer, const size_t InBufferSize, const PMX::EncodingType InEncoding);
         void Delete();
 
         PMX::EncodingType GetEncodingType();
@@ -96,36 +96,36 @@ namespace PMX
 
     struct BDEF1
     {
-        int Index;
+        int Index0;
     };
 
     struct BDEF2
     {
+        int Index0;
         int Index1;
-        int Index2;
-        float Weight1;
-        float Weight2; // = 1.0 - Weight1
+        float Weight0;
+        float Weight1; // = 1.0 - Weight1
     };
 
     struct BDEF4
     {
+        int Index0;
         int Index1;
         int Index2;
         int Index3;
-        int Index4;
+        float Weight0; // 총 가중치는 1.0을 보장하지 않음
         float Weight1; // 총 가중치는 1.0을 보장하지 않음
         float Weight2; // 총 가중치는 1.0을 보장하지 않음
         float Weight3; // 총 가중치는 1.0을 보장하지 않음
-        float Weight4; // 총 가중치는 1.0을 보장하지 않음
     };
 
     // Spherical deform blending
     struct SDEF
     {
+        int Index0;
         int Index1;
-        int Index2;
-        float Weight1;
-        float Weight2; // = 1.0 - Weight1
+        float Weight0;
+        float Weight1; // = 1.0 - Weight1
 
         PMX::Vector3 C;  // ???
         PMX::Vector3 R0; // ???
@@ -135,14 +135,14 @@ namespace PMX
     // Dual quaternion deform blending
     struct QDEF
     {
+        int Index0;
         int Index1;
         int Index2;
         int Index3;
-        int Index4;
+        float Weight0; // 총 가중치는 1.0을 보장하지 않음
         float Weight1; // 총 가중치는 1.0을 보장하지 않음
         float Weight2; // 총 가중치는 1.0을 보장하지 않음
         float Weight3; // 총 가중치는 1.0을 보장하지 않음
-        float Weight4; // 총 가중치는 1.0을 보장하지 않음
     };
 
     enum class WeightDeformType : PMX::Byte
@@ -154,7 +154,7 @@ namespace PMX
         QDEF
     };
 
-    struct Vertex
+    struct VertexData
     {
         PMX::Vector3 Position;
         PMX::Vector3 Normal;
@@ -174,5 +174,43 @@ namespace PMX
         } WeightDeform;
 
         float EdgeScale;
+    };
+
+    struct SurfaceData
+    {
+        int VertexIndex[3];
+    };
+
+    struct TextureData
+    {
+        Text Path;
+    };
+
+    struct MaterialData
+    {
+    };
+
+    struct BoneData
+    {
+    };
+
+    struct MorphData
+    {
+    };
+
+    struct DisplayFrameData
+    {
+    };
+
+    struct RigidbodyData
+    {
+    };
+
+    struct JointData
+    {
+    };
+
+    struct SoftBodyData
+    {
     };
 }
