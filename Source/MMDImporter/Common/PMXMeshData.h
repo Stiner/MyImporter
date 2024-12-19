@@ -12,24 +12,22 @@ public:
     void Delete();
 
 protected:
-    size_t ReadBuffer(void* OutDest, const PMX::Byte* const InBuffer, const size_t ReadSize);
-    size_t ReadText(PMX::Text& OutString, const PMX::Byte* InBuffer);
+    void ReadText(PMX::Text& OutString, const PMX::Byte*& InOutBufferCursor);
 
     bool IsValidPMXFile(const PMX::Header& Header);
 
-    size_t ReadHeader(const PMX::Byte* const InBuffer);
-    size_t ReadModelInfo(const PMX::Byte* const InBuffer);
-
-    size_t ReadVertices(const PMX::Byte* InBuffer);
-    size_t ReadSurfaces(const PMX::Byte* InBuffer);
-    size_t ReadTextures(const PMX::Byte* InBuffer);
-    size_t ReadMaterials(const PMX::Byte* InBuffer);
-    size_t ReadBones(const PMX::Byte* InBuffer);
-    size_t ReadMorphs(const PMX::Byte* InBuffer);
-    size_t ReadDisplayFrames(const PMX::Byte* InBuffer);
-    size_t ReadRigidbodies(const PMX::Byte* InBuffer);
-    size_t ReadJoints(const PMX::Byte* InBuffer);
-    size_t ReadSoftBodies(const PMX::Byte* InBuffer);
+    void ReadHeader(const PMX::Byte*& InOutBufferCursor);
+    void ReadModelInfo(const PMX::Byte*& InOutBufferCursor);
+    void ReadVertices(const PMX::Byte*& InOutBufferCursor);
+    void ReadSurfaces(const PMX::Byte*& InOutBufferCursor);
+    void ReadTextures(const PMX::Byte*& InOutBufferCursor);
+    void ReadMaterials(const PMX::Byte*& InOutBufferCursor);
+    void ReadBones(const PMX::Byte*& InOutBufferCursor);
+    void ReadMorphs(const PMX::Byte*& InOutBufferCursor);
+    void ReadDisplayFrames(const PMX::Byte*& InOutBufferCursor);
+    void ReadRigidbodies(const PMX::Byte*& InOutBufferCursor);
+    void ReadJoints(const PMX::Byte*& InOutBufferCursor);
+    void ReadSoftBodies(const PMX::Byte*& InOutBufferCursor);
 
 protected:
     PMX::Header Header = { 0, };
