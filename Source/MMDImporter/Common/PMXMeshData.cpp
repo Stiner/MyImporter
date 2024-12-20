@@ -224,9 +224,9 @@ void PMXMeshData::ReadVertices(const PMX::Byte*& InOutBufferCursor)
                     auto& BDef4 = Vertex.WeightDeform.BDef4;
 
                     ReadIndex(BDef4.BoneIndex0, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
-                    ReadIndex(BDef4.Index1, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
-                    ReadIndex(BDef4.Index2, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
-                    ReadIndex(BDef4.Index3, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
+                    ReadIndex(BDef4.BoneIndex1, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
+                    ReadIndex(BDef4.BoneIndex2, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
+                    ReadIndex(BDef4.BoneIndex3, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
 
                     ReadBuffer(&BDef4.Weight0, InOutBufferCursor, sizeof(BDef4.Weight0));
                     ReadBuffer(&BDef4.Weight1, InOutBufferCursor, sizeof(BDef4.Weight1));
@@ -238,8 +238,8 @@ void PMXMeshData::ReadVertices(const PMX::Byte*& InOutBufferCursor)
                 {
                     auto& SDef = Vertex.WeightDeform.SDef;
 
-                    ReadIndex(SDef.Index0, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
-                    ReadIndex(SDef.Index1, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
+                    ReadIndex(SDef.BoneIndex0, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
+                    ReadIndex(SDef.BoneIndex1, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
 
                     ReadBuffer(&SDef.Weight0, InOutBufferCursor, sizeof(SDef.Weight0));
                     SDef.Weight1 = 1.0f - SDef.Weight0;
@@ -253,10 +253,10 @@ void PMXMeshData::ReadVertices(const PMX::Byte*& InOutBufferCursor)
                 {
                     auto& QDef = Vertex.WeightDeform.QDef;
 
-                    ReadIndex(QDef.Index0, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
-                    ReadIndex(QDef.Index1, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
-                    ReadIndex(QDef.Index2, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
-                    ReadIndex(QDef.Index3, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
+                    ReadIndex(QDef.BoneIndex0, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
+                    ReadIndex(QDef.BoneIndex1, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
+                    ReadIndex(QDef.BoneIndex2, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
+                    ReadIndex(QDef.BoneIndex3, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
 
                     ReadBuffer(&QDef.Weight0, InOutBufferCursor, sizeof(QDef.Weight0));
                     ReadBuffer(&QDef.Weight1, InOutBufferCursor, sizeof(QDef.Weight1));
@@ -347,10 +347,7 @@ void PMXMeshData::ReadBones(const PMX::Byte*& InOutBufferCursor)
     if (BoneCount <= 0)
         return;
 
-
-
     Bones = new PMX::BoneData[BoneCount];
-
 }
 
 void PMXMeshData::ReadMorphs(const PMX::Byte*& InOutBufferCursor)
