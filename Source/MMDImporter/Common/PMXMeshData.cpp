@@ -37,6 +37,11 @@ void ReadIndex(int& OutIndex, const PMX::Byte*& InOutBufferCursor, const PMX::In
 
 const PMX::Byte* p;
 
+PMXMeshData::~PMXMeshData()
+{
+    Delete();
+}
+
 bool PMXMeshData::LoadBinary(const PMX::Byte* const InBuffer, const size_t InBufferSize)
 {
     if (InBuffer == nullptr || InBufferSize == 0)

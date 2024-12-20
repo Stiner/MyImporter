@@ -8,6 +8,8 @@
 class PMXMeshData
 {
 public:
+    ~PMXMeshData();
+
     bool LoadBinary(const PMX::Byte* const Buffer, const size_t BufferSize);
     void Delete();
 
