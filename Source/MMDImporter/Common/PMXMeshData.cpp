@@ -204,55 +204,55 @@ void PMXMeshData::ReadVertices(const PMX::Byte*& InOutBufferCursor)
         {
             case PMX::WeightDeformType::BDEF1:
                 {
-                    auto& WeightDeform = Vertex.WeightDeform.BDef1;
+                    auto& BDef1 = Vertex.WeightDeform.BDef1;
 
-                    ReadIndex(WeightDeform.Index0, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
+                    ReadIndex(BDef1.Index0, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
                 }
                 break;
             case PMX::WeightDeformType::BDEF2:
                 {
-                    auto& WeightDeform = Vertex.WeightDeform.BDef2;
+                    auto& BDef2 = Vertex.WeightDeform.BDef2;
 
-                    ReadIndex(WeightDeform.Index0, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
-                    ReadIndex(WeightDeform.Index1, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
+                    ReadIndex(BDef2.Index0, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
+                    ReadIndex(BDef2.Index1, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
 
-                    ReadBuffer(&WeightDeform.Weight0, InOutBufferCursor, sizeof(WeightDeform.Weight0));
-                    WeightDeform.Weight1 = 1.0f - WeightDeform.Weight0;
+                    ReadBuffer(&BDef2.Weight0, InOutBufferCursor, sizeof(BDef2.Weight0));
+                    BDef2.Weight1 = 1.0f - BDef2.Weight0;
                 }
                 break;
             case PMX::WeightDeformType::BDEF4:
                 {
-                    auto& WeightDeform = Vertex.WeightDeform.BDef4;
+                    auto& BDef4 = Vertex.WeightDeform.BDef4;
 
-                    ReadIndex(WeightDeform.Index0, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
-                    ReadIndex(WeightDeform.Index1, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
-                    ReadIndex(WeightDeform.Index2, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
-                    ReadIndex(WeightDeform.Index3, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
+                    ReadIndex(BDef4.Index0, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
+                    ReadIndex(BDef4.Index1, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
+                    ReadIndex(BDef4.Index2, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
+                    ReadIndex(BDef4.Index3, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
 
-                    ReadBuffer(&WeightDeform.Weight0, InOutBufferCursor, sizeof(WeightDeform.Weight0));
-                    ReadBuffer(&WeightDeform.Weight1, InOutBufferCursor, sizeof(WeightDeform.Weight1));
-                    ReadBuffer(&WeightDeform.Weight2, InOutBufferCursor, sizeof(WeightDeform.Weight2));
-                    ReadBuffer(&WeightDeform.Weight3, InOutBufferCursor, sizeof(WeightDeform.Weight3));
+                    ReadBuffer(&BDef4.Weight0, InOutBufferCursor, sizeof(BDef4.Weight0));
+                    ReadBuffer(&BDef4.Weight1, InOutBufferCursor, sizeof(BDef4.Weight1));
+                    ReadBuffer(&BDef4.Weight2, InOutBufferCursor, sizeof(BDef4.Weight2));
+                    ReadBuffer(&BDef4.Weight3, InOutBufferCursor, sizeof(BDef4.Weight3));
                 }
                 break;
             case PMX::WeightDeformType::SDEF:
                 {
-                    auto& WeightDeform = Vertex.WeightDeform.SDef;
+                    auto& SDef = Vertex.WeightDeform.SDef;
 
-                    ReadIndex(WeightDeform.Index0, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
-                    ReadIndex(WeightDeform.Index1, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
+                    ReadIndex(SDef.Index0, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
+                    ReadIndex(SDef.Index1, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
 
-                    ReadBuffer(&WeightDeform.Weight0, InOutBufferCursor, sizeof(WeightDeform.Weight0));
-                    WeightDeform.Weight1 = 1.0f - WeightDeform.Weight0;
+                    ReadBuffer(&SDef.Weight0, InOutBufferCursor, sizeof(SDef.Weight0));
+                    SDef.Weight1 = 1.0f - SDef.Weight0;
 
-                    ReadBuffer(&WeightDeform.C, InOutBufferCursor, sizeof(WeightDeform.C));
-                    ReadBuffer(&WeightDeform.R0, InOutBufferCursor, sizeof(WeightDeform.R0));
-                    ReadBuffer(&WeightDeform.R1, InOutBufferCursor, sizeof(WeightDeform.R1));
+                    ReadBuffer(&SDef.C, InOutBufferCursor, sizeof(SDef.C));
+                    ReadBuffer(&SDef.R0, InOutBufferCursor, sizeof(SDef.R0));
+                    ReadBuffer(&SDef.R1, InOutBufferCursor, sizeof(SDef.R1));
                 }
                 break;
             case PMX::WeightDeformType::QDEF:
                 {
-                    auto& WeightDeform = Vertex.WeightDeform.QDef;
+                    auto& QDef = Vertex.WeightDeform.QDef;
 
                     ReadIndex(WeightDeform.Index0, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
                     ReadIndex(WeightDeform.Index1, InOutBufferCursor, PMX::IndexType::Bone, Header.BoneIndexSize);
