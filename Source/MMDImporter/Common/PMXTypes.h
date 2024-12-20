@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "PMXDefines.h"
+
 namespace PMX
 {
     typedef char            Byte;
@@ -289,8 +291,112 @@ namespace PMX
         int SurfaceCount;
     };
 
+    enum class BoneFlag : PMX::UByte
+    {
+        IndexedTailPosition,    // 꼬리 위치가 vec3인지 뼈 인덱스인지
+        Rotatable,              // 회전을 활성화합니다
+        Translatable,           // 번역(전단)이 가능합니다.
+        IsVisible,              // ???
+        Enabled,                // ???
+        IK,                     // 역 운동학(물리학)을 사용하세요
+        InheritRotation,        // 회전은 다른 뼈에서 상속됩니다.
+        InheritTranslation,     // 번역은 다른 뼈대에서 상속됩니다
+        FixedAxis,              // 뼈의 축은 방향으로 고정되어 있습니다
+        LocalCoordinate,        // ???
+        PhysicsAfterDeform,     // ???
+        ExternalParentDeform,   // ???
+    };
+
+    struct InheritBone
+    {
+        int ParentBoneIndex;
+        float ParentInfluence;
+    };
+
+    struct BoneFixedAxis
+    {
+        PMX::Vector3 AxisDirection;
+    };
+
+    struct BoneLocalCoordinate
+    {
+        PMX::Vector3 XVector;
+        PMX::Vector3 ZVector;
+    };
+
+    struct BoneExternalParent
+    {
+        int ParentBoneIndex;
+    };
+
+    struct IKAngleLimit
+    {
+        PMX::Vector3 Min;
+        PMX::Vector3 Max;
+    };
+
+    struct IKLinks
+    {
+        int BoneIndex;
+        PMX::Byte HasLimit; // 1과 같으면 각도 제한을 사용합니다.
+
+        IKAngleLimit* Limit;
+
+        ~IKLinks()
+        {
+            PMX_SAFE_DELETE(Limit);
+        }
+    };
+
+    struct BoneIK
+    {
+        int TargetIndex;
+        int LoopCount;
+        float LimitRadian;
+        int LinkCount;
+
+        PMX::IKLinks* Links;
+
+        ~BoneIK()
+        {
+            PMX_SAFE_DELETE_ARRAY(Links);
+        }
+    };
+
     struct BoneData
     {
+        PMX::Text NameLocal;
+        PMX::Text NameUniversal;
+        PMX::Vector3 Position;
+        int ParentBoneIndex;
+        int Layer;
+        PMX::BoneFlag Flags[2];
+
+        union
+        {
+            int BoneIndex;
+            PMX::Vector3 Vector3;
+        } TailPosition;
+
+        // InheritRotation/InheritTranslation 플래그 중 하나가 설정된 경우 사용됩니다.
+        PMX::InheritBone* InheritBone;
+        // FixedAxis 플래그가 설정된 경우 사용됩니다.
+        PMX::BoneFixedAxis* FixedAxis;
+        // LocalCoordinate 플래그가 설정된 경우 사용됩니다.
+        PMX::BoneLocalCoordinate* LocalCoordinate;
+        // ExternalParentDeform 플래그가 설정된 경우 사용됩니다.
+        PMX::BoneExternalParent* ExternalParent;
+        // IK 플래그가 설정된 경우 사용됩니다.
+        PMX::BoneIK* IK;
+
+        ~BoneData()
+        {
+            PMX_SAFE_DELETE(InheritBone);
+            PMX_SAFE_DELETE(FixedAxis);
+            PMX_SAFE_DELETE(LocalCoordinate);
+            PMX_SAFE_DELETE(ExternalParent);
+            PMX_SAFE_DELETE(IK);
+        }
     };
 
     struct MorphData

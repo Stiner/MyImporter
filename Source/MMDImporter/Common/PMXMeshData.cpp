@@ -343,8 +343,14 @@ void PMXMeshData::ReadMaterials(const PMX::Byte*& InOutBufferCursor)
 
 void PMXMeshData::ReadBones(const PMX::Byte*& InOutBufferCursor)
 {
+    ReadBuffer(&BoneCount, InOutBufferCursor, sizeof(BoneCount));
+
+    if (BoneCount <= 0)
+        return;
 
 
+
+    Bones = new PMX::BoneData[BoneCount];
 
 }
 
