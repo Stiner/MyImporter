@@ -109,20 +109,20 @@ namespace PMX
 
     struct BDEF1
     {
-        int Index0;
+        int BoneIndex0;
     };
 
     struct BDEF2
     {
-        int Index0;
-        int Index1;
+        int BoneIndex0;
+        int BoneIndex1;
         float Weight0;
         float Weight1; // = 1.0 - Weight1
     };
 
     struct BDEF4
     {
-        int Index0;
+        int BoneIndex0;
         int Index1;
         int Index2;
         int Index3;
@@ -261,7 +261,7 @@ namespace PMX
         int TextureIndex;
 
         // 텍스처 인덱스와 동일하지만 환경 매핑용입니다.
-        int EnvironmentIndex;
+        int EnvironmentTextureIndex;
 
         // 0 = disabled, 1 = multiply, 2 = additive, 3 = additional vec4
         // additional vec4
