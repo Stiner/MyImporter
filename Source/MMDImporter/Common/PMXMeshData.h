@@ -14,7 +14,7 @@ public:
     void Delete();
 
 protected:
-    void ReadText(PMX::Text& OutString, const PMX::Byte*& InOutBufferCursor);
+    void ReadText(PMX::Text* OutString, const PMX::Byte*& InOutBufferCursor);
 
     bool IsValidPMXFile(const PMX::Header& Header);
 

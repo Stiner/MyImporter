@@ -187,7 +187,7 @@ namespace PMX
             SDEF SDef;
             QDEF QDef;
 
-        } WeightDeform;
+        } WeightDeform = { 0 };
 
         float EdgeScale = 0;
     };
@@ -200,21 +200,6 @@ namespace PMX
     struct TextureData
     {
         PMX::Text Path;
-    };
-
-    // Bit flags
-    enum class MaterialFlag : PMX::UByte
-    {
-        NoCull        = 1 << 0, // 후면 컬링 비활성화
-        GroundShadow  = 1 << 1, // 지오메트리에 그림자 투영
-        DrawShadow    = 1 << 2, // 그림자 맵에 그리기
-        ReceiveShadow = 1 << 3, // 그림자 맵으로 부터 그림자 적용
-        HasEdge       = 1 << 4, // 연필? 아웃라인
-        VertexColor   = 1 << 5, // 추가 Vector의 첫번째 것으로 정점 색 지정
-        PointDrawing  = 1 << 6, // 정점을 점으로 표시
-        LineDrawing   = 1 << 7, // 삼각형을 선분으로 표시
-
-        // 둘 다 설정된 경우, 점 그리기 플래그가 선 그리기 플래그보다 우선합니다.
     };
 
     enum class BlendModeType : PMX::UByte
@@ -233,6 +218,21 @@ namespace PMX
 
     struct MaterialData
     {
+        // Bit flag
+        enum Flag : PMX::UByte
+        {
+            NoCull        = 1 << 0, // 후면 컬링 비활성화
+            GroundShadow  = 1 << 1, // 지오메트리에 그림자 투영
+            DrawShadow    = 1 << 2, // 그림자 맵에 그리기
+            ReceiveShadow = 1 << 3, // 그림자 맵으로 부터 그림자 적용
+            HasEdge       = 1 << 4, // 연필? 아웃라인
+            VertexColor   = 1 << 5, // 추가 Vector의 첫번째 것으로 정점 색 지정
+            PointDrawing  = 1 << 6, // 정점을 점으로 표시
+            LineDrawing   = 1 << 7, // 삼각형을 선분으로 표시
+
+            // PointDrawing/LineDrawing 둘 다 설정된 경우, 점 그리기 플래그가 선 그리기 플래그보다 우선합니다.
+        };
+
         // 재료에 대한 편리한 이름(보통 일본어)
         PMX::Text NameLocal;
 
@@ -252,7 +252,7 @@ namespace PMX
         PMX::Vector3 AmbientColor;
 
         // 재료 플래그 보기
-        PMX::MaterialFlag DrawingFlags = (PMX::MaterialFlag)-1;
+        PMX::MaterialData::Flag DrawingFlags = (PMX::MaterialData::Flag)0;
 
         // 연필 윤곽선 가장자리의 RGBA 색상(반투명의 경우 알파)
         PMX::Vector4 EdgeColor;
@@ -292,22 +292,6 @@ namespace PMX
         //   이는 이전 재료의 오프셋에서 현재 재료의 크기에 따라 결정됩니다.
         //   모든 재료의 표면 수를 모두 더하면 총 표면 수가 됩니다.
         int SurfaceCount = 0;
-    };
-
-    enum class BoneFlag : PMX::UByte
-    {
-        IndexedTailPosition,    // 꼬리 위치가 vec3인지 뼈 인덱스인지
-        Rotatable,              // 회전을 활성화합니다
-        Translatable,           // 번역(전단)이 가능합니다.
-        IsVisible,              // ???
-        Enabled,                // ???
-        IK,                     // 역 운동학(물리학)을 사용하세요
-        InheritRotation,        // 회전은 다른 뼈에서 상속됩니다.
-        InheritTranslation,     // 번역은 다른 뼈대에서 상속됩니다
-        FixedAxis,              // 뼈의 축은 방향으로 고정되어 있습니다
-        LocalCoordinate,        // ???
-        PhysicsAfterDeform,     // ???
-        ExternalParentDeform,   // ???
     };
 
     struct InheritBone
@@ -368,37 +352,53 @@ namespace PMX
 
     struct BoneData
     {
+        enum Flag : unsigned short
+        {
+            IndexedTailPosition  = 1 <<  0,  // 꼬리 위치가 vec3인지 뼈 인덱스인지
+            Rotatable            = 1 <<  1,  // 회전을 활성화합니다
+            Translatable         = 1 <<  2,  // 번역(전단)이 가능합니다.
+            IsVisible            = 1 <<  3,  // ???
+            Enabled              = 1 <<  4,  // ???
+            IK                   = 1 <<  5,  // 역 운동학(물리학)을 사용하세요
+            InheritRotation      = 1 <<  6,  // 회전은 다른 뼈에서 상속됩니다.
+            InheritTranslation   = 1 <<  7,  // 번역은 다른 뼈대에서 상속됩니다
+            FixedAxis            = 1 <<  8,  // 뼈의 축은 방향으로 고정되어 있습니다
+            LocalCoordinate      = 1 <<  9,  // ???
+            PhysicsAfterDeform   = 1 << 10,  // ???
+            ExternalParentDeform = 1 << 11,  // ???
+        };
+
         PMX::Text NameLocal;
         PMX::Text NameUniversal;
         PMX::Vector3 Position;
         int ParentBoneIndex = 0;
         int Layer = 0;
-        PMX::BoneFlag Flags[2];
+        PMX::BoneData::Flag Flags = (PMX::BoneData::Flag)0;
 
         union
         {
             PMX::Vector3 Vector3;
             int BoneIndex;
-        } TailPosition;
+        } TailPosition = { 0 };
 
         // InheritRotation/InheritTranslation 플래그 중 하나가 설정된 경우 사용됩니다.
-        PMX::InheritBone* InheritBone = nullptr;
+        PMX::InheritBone* InheritBoneData = nullptr;
         // FixedAxis 플래그가 설정된 경우 사용됩니다.
-        PMX::BoneFixedAxis* FixedAxis = nullptr;
+        PMX::BoneFixedAxis* FixedAxisData = nullptr;
         // LocalCoordinate 플래그가 설정된 경우 사용됩니다.
-        PMX::BoneLocalCoordinate* LocalCoordinate = nullptr;
+        PMX::BoneLocalCoordinate* LocalCoordinateData = nullptr;
         // ExternalParentDeform 플래그가 설정된 경우 사용됩니다.
-        PMX::BoneExternalParent* ExternalParent = nullptr;
+        PMX::BoneExternalParent* ExternalParentData = nullptr;
         // IK 플래그가 설정된 경우 사용됩니다.
-        PMX::BoneIK* IK = nullptr;
+        PMX::BoneIK* IKData = nullptr;
 
         ~BoneData()
         {
-            PMX_SAFE_DELETE(InheritBone);
-            PMX_SAFE_DELETE(FixedAxis);
-            PMX_SAFE_DELETE(LocalCoordinate);
-            PMX_SAFE_DELETE(ExternalParent);
-            PMX_SAFE_DELETE(IK);
+            PMX_SAFE_DELETE(InheritBoneData);
+            PMX_SAFE_DELETE(FixedAxisData);
+            PMX_SAFE_DELETE(LocalCoordinateData);
+            PMX_SAFE_DELETE(ExternalParentData);
+            PMX_SAFE_DELETE(IKData);
         }
     };
 
