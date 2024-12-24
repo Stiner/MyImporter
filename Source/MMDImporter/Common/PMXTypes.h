@@ -358,18 +358,25 @@ namespace PMX
     {
         enum Flag : UInt16
         {
+            // 낮은 8Bit
             IndexedTailPosition  = 1 <<  0,  // 꼬리 위치가 vec3인지 뼈 인덱스인지
             Rotatable            = 1 <<  1,  // 회전을 활성화합니다
             Translatable         = 1 <<  2,  // 번역(전단)이 가능합니다.
             IsVisible            = 1 <<  3,  // ???
             Enabled              = 1 <<  4,  // ???
-            IK                   = 1 <<  5,  // 역 운동학(물리학)을 사용하세요
-            InheritRotation      = 1 <<  6,  // 회전은 다른 뼈에서 상속됩니다.
-            InheritTranslation   = 1 <<  7,  // 번역은 다른 뼈대에서 상속됩니다
-            FixedAxis            = 1 <<  8,  // 뼈의 축은 방향으로 고정되어 있습니다
-            LocalCoordinate      = 1 <<  9,  // ???
-            PhysicsAfterDeform   = 1 << 10,  // ???
-            ExternalParentDeform = 1 << 11,  // ???
+            IK                   = 1 <<  5,  // 역 운동학(물리학) 사용
+            //                   = 1 <<  6,  // 안씀
+            //                   = 1 <<  7,  // 안씀
+
+            // 높은 8bit
+            InheritRotation      = 1 <<  8,  // 회전은 다른 뼈에서 상속됩니다.
+            InheritTranslation   = 1 <<  9,  // 번역은 다른 뼈대에서 상속됩니다
+            FixedAxis            = 1 << 10,  // 뼈의 축은 방향으로 고정되어 있습니다
+            LocalCoordinate      = 1 << 11,  // ???
+            PhysicsAfterDeform   = 1 << 12,  // ???
+            ExternalParentDeform = 1 << 13,  // ???
+            //                   = 1 << 14,  // 안씀
+            //                   = 1 << 15,  // 안씀
         };
 
         Text NameLocal;
