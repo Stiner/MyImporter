@@ -7,6 +7,14 @@ namespace PMX
     typedef char            Byte;
     typedef unsigned char   UByte;
 
+    typedef char            Int8;
+    typedef short           Int16;
+
+    typedef unsigned char   UInt8;
+    typedef unsigned short  UInt16;
+
+    typedef size_t          MemSize;
+
     struct Vector2
     {
         float X = 0;
@@ -38,31 +46,32 @@ namespace PMX
         Rigidbody,
     };
 
-    enum class EncodingType : PMX::UByte
-    {
-        UTF16LE,
-        UTF8,
-    };
-
-    struct Text
+    class Text
     {
     public:
-        void SetText(PMX::Byte* const InBuffer, const size_t InBufferSize, const PMX::EncodingType InEncoding);
+        enum EncodingType : UInt8
+        {
+            UTF16LE,
+            UTF8,
+        };
+
+    public:
+        void SetText(Byte* const InBuffer, const MemSize InBufferSize, const Text::EncodingType InEncoding);
         void Delete();
 
-        PMX::EncodingType GetEncodingType();
+        Text::EncodingType GetEncodingType();
         const wchar_t* GetUTF16LE();
         const char* GetUTF8();
 
         int GetLength();
 
         // Null 끝을 포함한 메모리 크기
-        size_t GetBufferSize();
+        MemSize GetBufferSize();
 
     protected:
         int Length = 0;
 
-        PMX::EncodingType Encoding = PMX::EncodingType::UTF16LE;
+        Text::EncodingType Encoding = Text::EncodingType::UTF16LE;
 
         union
         {
@@ -73,25 +82,25 @@ namespace PMX
 
     struct Header
     {
-        PMX::Byte Signature[4]{ 0 };    // "PMX " (0x50, 0x4d, 0x58, 0x20) : 공백으로 끝을 알림
+        UInt8 Signature[4]{ 0 };    // "PMX " (0x50, 0x4d, 0x58, 0x20) : 공백으로 끝을 알림
         float Version = 0;              // 2.0 / 2.1 : floating point 로 비교
 
-        PMX::EncodingType TextEncoding = PMX::EncodingType::UTF16LE;
-        PMX::Byte AdditionalVectorCount = 0;
-        PMX::Byte VertexIndexSize = 0;
-        PMX::Byte TextureIndexSize = 0;
-        PMX::Byte MaterialIndexSize = 0;
-        PMX::Byte BoneIndexSize = 0;
-        PMX::Byte MorphIndexSize = 0;
-        PMX::Byte RigidbodyIndexSize = 0;
+        Text::EncodingType TextEncoding = Text::EncodingType::UTF16LE;
+        UInt8 AdditionalVectorCount = 0;
+        UInt8 VertexIndexSize = 0;
+        UInt8 TextureIndexSize = 0;
+        UInt8 MaterialIndexSize = 0;
+        UInt8 BoneIndexSize = 0;
+        UInt8 MorphIndexSize = 0;
+        UInt8 RigidbodyIndexSize = 0;
     };
 
     struct ModelInfo
     {
-        PMX::Text NameLocal;
-        PMX::Text NameUniversal;
-        PMX::Text CommentsLocal;
-        PMX::Text CommentsUniversal;
+        Text NameLocal;
+        Text NameUniversal;
+        Text CommentsLocal;
+        Text CommentsUniversal;
 
         ~ModelInfo()
         {
@@ -140,9 +149,9 @@ namespace PMX
         float Weight0 = -1;
         float Weight1 = -1; // = 1.0 - Weight1
 
-        PMX::Vector3 C;  // ???
-        PMX::Vector3 R0; // ???
-        PMX::Vector3 R1; // ???
+        Vector3 C;  // ???
+        Vector3 R0; // ???
+        Vector3 R1; // ???
     };
 
     // Dual quaternion deform blending
@@ -158,7 +167,7 @@ namespace PMX
         float Weight3 = -1; // 총 가중치는 1.0을 보장하지 않음
     };
 
-    enum class WeightDeformType : PMX::UByte
+    enum class WeightDeformType : UByte
     {
         BDEF1,
         BDEF2,
@@ -169,15 +178,15 @@ namespace PMX
 
     struct VertexData
     {
-        PMX::Vector3 Position;
-        PMX::Vector3 Normal;
-        PMX::Vector2 UV;
+        Vector3 Position;
+        Vector3 Normal;
+        Vector2 UV;
 
         // Globals에 의해 갯수가 정해지며, 0개일 수 있음
-        PMX::Vector4 Additional[4];
+        Vector4 Additional[4];
 
         // WeightDeformType에 따라 BDEF1..4/SDEF/QDEF 선택
-        PMX::WeightDeformType WeightDeformType = PMX::WeightDeformType::BDEF1;
+        WeightDeformType WeightDeformType = WeightDeformType::BDEF1;
 
         union
         {
@@ -199,10 +208,10 @@ namespace PMX
 
     struct TextureData
     {
-        PMX::Text Path;
+        Text Path;
     };
 
-    enum class BlendModeType : PMX::UByte
+    enum class BlendModeType : UInt8
     {
         Disable,
         Multiply,
@@ -210,7 +219,7 @@ namespace PMX
         AdditionalVec4,
     };
 
-    enum class ToonReferenceType : PMX::UByte
+    enum class ToonReferenceType : UInt8
     {
         Texture,
         Internal
@@ -219,7 +228,7 @@ namespace PMX
     struct MaterialData
     {
         // Bit flag
-        enum Flag : PMX::UByte
+        enum Flag : UInt8
         {
             NoCull        = 1 << 0, // 후면 컬링 비활성화
             GroundShadow  = 1 << 1, // 지오메트리에 그림자 투영
@@ -234,28 +243,28 @@ namespace PMX
         };
 
         // 재료에 대한 편리한 이름(보통 일본어)
-        PMX::Text NameLocal;
+        Text NameLocal;
 
         // 재료에 대한 편리한 이름(보통 영어)
-        PMX::Text NameUniversal;
+        Text NameUniversal;
 
         // RGBA 색상(알파는 반투명 재질을 설정합니다)
-        PMX::Vector4 DiffuseColor;
+        Vector4 DiffuseColor;
 
         // 반사광의 RGB 색상
-        PMX::Vector3 SpecularColor;
+        Vector3 SpecularColor;
 
         // 반사 하이라이트의 "크기"
         float SpecularStrength = 0;
 
         // 재료 그림자의 RGB 색상(빛이 없을 때)
-        PMX::Vector3 AmbientColor;
+        Vector3 AmbientColor;
 
         // 재료 플래그 보기
-        PMX::MaterialData::Flag DrawingFlags = (PMX::MaterialData::Flag)0;
+        MaterialData::Flag DrawingFlags = (MaterialData::Flag)0;
 
         // 연필 윤곽선 가장자리의 RGBA 색상(반투명의 경우 알파)
-        PMX::Vector4 EdgeColor;
+        Vector4 EdgeColor;
 
         // 연필 윤곽선 크기(1.0은 약 1픽셀이어야 함)
         float EdgeScale = 0;
@@ -272,20 +281,20 @@ namespace PMX
         //   텍스처 UV로 X 및 Y 값만 사용합니다.
         //   이는 추가 텍스처 레이어로 매핑됩니다.
         //   이는 첫 번째 추가 vec4의 다른 용도와 충돌할 수 있습니다.
-        PMX::BlendModeType EnvironmentBlendMode = (PMX::BlendModeType)-1;
+        BlendModeType EnvironmentBlendMode = (BlendModeType)-1;
 
         // 0 = Texture reference, 1 = internal reference
-        PMX::ToonReferenceType ToonReference = (PMX::ToonReferenceType)-1;
+        ToonReferenceType ToonReference = (ToonReferenceType)-1;
 
         // 동작은 Toon 참조 값에 따라 달라집니다.
         // : Toon 참조 바이트가 1인 경우를 제외하고는
         //   Toon 값은 표준 텍스처 및 환경 텍스처 인덱스와 매우 유사한 텍스처 인덱스가 됩니다.
         //   1인 경우 Toon 값은 10개의 내부 Toon 텍스처 세트를 참조하는 바이트가 됩니다
         //   (대부분 구현은 "toon01.bmp" ~ "toon10.bmp"를 내부 텍스처로 사용합니다. 위의 텍스처에 대해 예약된 이름 참조).
-        PMX::Byte ToonValue = 0;
+        Byte ToonValue = 0;
 
         // 스크립팅이나 추가 데이터에 사용됩니다.
-        PMX::Text MetaData;
+        Text MetaData;
 
         // 이 재료가 영향을 미치는 표면의 수
         // : 표면 수는 항상 3의 배수입니다.
@@ -302,13 +311,13 @@ namespace PMX
 
     struct BoneFixedAxis
     {
-        PMX::Vector3 AxisDirection;
+        Vector3 AxisDirection;
     };
 
     struct BoneLocalCoordinate
     {
-        PMX::Vector3 XVector;
-        PMX::Vector3 ZVector;
+        Vector3 XVector;
+        Vector3 ZVector;
     };
 
     struct BoneExternalParent
@@ -318,21 +327,16 @@ namespace PMX
 
     struct IKAngleLimit
     {
-        PMX::Vector3 Min;
-        PMX::Vector3 Max;
+        Vector3 Min;
+        Vector3 Max;
     };
 
     struct IKLinks
     {
         int BoneIndex = 0;
-        PMX::Byte HasLimit = 0; // 1과 같으면 각도 제한을 사용합니다.
+        Byte HasLimit = 0; // 1과 같으면 각도 제한을 사용합니다.
 
-        IKAngleLimit* Limit = nullptr;
-
-        ~IKLinks()
-        {
-            PMX_SAFE_DELETE(Limit);
-        }
+        IKAngleLimit Limit = { 0 };
     };
 
     struct BoneIK
@@ -342,7 +346,7 @@ namespace PMX
         float LimitRadian = 0;
         int LinkCount = 0;
 
-        PMX::IKLinks* Links = nullptr;
+        IKLinks* Links = nullptr;
 
         ~BoneIK()
         {
@@ -352,7 +356,7 @@ namespace PMX
 
     struct BoneData
     {
-        enum Flag : unsigned short
+        enum Flag : UInt16
         {
             IndexedTailPosition  = 1 <<  0,  // 꼬리 위치가 vec3인지 뼈 인덱스인지
             Rotatable            = 1 <<  1,  // 회전을 활성화합니다
@@ -368,38 +372,29 @@ namespace PMX
             ExternalParentDeform = 1 << 11,  // ???
         };
 
-        PMX::Text NameLocal;
-        PMX::Text NameUniversal;
-        PMX::Vector3 Position;
+        Text NameLocal;
+        Text NameUniversal;
+        Vector3 Position;
         int ParentBoneIndex = 0;
         int Layer = 0;
-        PMX::BoneData::Flag Flags = (PMX::BoneData::Flag)0;
+        BoneData::Flag Flags = (BoneData::Flag)0;
 
         union
         {
-            PMX::Vector3 Vector3;
+            Vector3 Vector3;
             int BoneIndex;
         } TailPosition = { 0 };
 
         // InheritRotation/InheritTranslation 플래그 중 하나가 설정된 경우 사용됩니다.
-        PMX::InheritBone* InheritBoneData = nullptr;
+        InheritBone InheritBoneData = { 0 };
         // FixedAxis 플래그가 설정된 경우 사용됩니다.
-        PMX::BoneFixedAxis* FixedAxisData = nullptr;
+        BoneFixedAxis FixedAxisData = { 0 };
         // LocalCoordinate 플래그가 설정된 경우 사용됩니다.
-        PMX::BoneLocalCoordinate* LocalCoordinateData = nullptr;
+        BoneLocalCoordinate LocalCoordinateData = { 0 };
         // ExternalParentDeform 플래그가 설정된 경우 사용됩니다.
-        PMX::BoneExternalParent* ExternalParentData = nullptr;
+        BoneExternalParent ExternalParentData = { 0 };
         // IK 플래그가 설정된 경우 사용됩니다.
-        PMX::BoneIK* IKData = nullptr;
-
-        ~BoneData()
-        {
-            PMX_SAFE_DELETE(InheritBoneData);
-            PMX_SAFE_DELETE(FixedAxisData);
-            PMX_SAFE_DELETE(LocalCoordinateData);
-            PMX_SAFE_DELETE(ExternalParentData);
-            PMX_SAFE_DELETE(IKData);
-        }
+        BoneIK IKData = { 0 };
     };
 
     struct MorphData

@@ -1,69 +1,72 @@
 ﻿#include "PMXTypes.h"
 
-void PMX::Text::SetText(PMX::Byte* const InBuffer, const size_t InBufferSize, const PMX::EncodingType InEncoding)
+namespace PMX
 {
-    Encoding = InEncoding;
-
-    switch (Encoding)
+    void Text::SetText(PMX::Byte* const InBuffer, const MemSize InBufferSize, const PMX::Text::EncodingType InEncoding)
     {
-        case EncodingType::UTF16LE:
-            TextData.UTF16LE = reinterpret_cast<wchar_t*>(InBuffer);
-            Length = static_cast<int>(InBufferSize / 2);
-            break;
-        case EncodingType::UTF8:
-            TextData.UTF8 = reinterpret_cast<char*>(InBuffer);
-            Length = static_cast<int>(InBufferSize / 3);
-            break;
-        default:
-            return;
-    }
-}
+        Encoding = InEncoding;
 
-void PMX::Text::Delete()
-{
-    switch (Encoding)
-    {
-        case PMX::EncodingType::UTF16LE:
-            if (TextData.UTF16LE != nullptr)
-                delete[] TextData.UTF16LE;
-            break;
-        case PMX::EncodingType::UTF8:
-            if (TextData.UTF8 != nullptr)
-                delete[] TextData.UTF8;
-            break;
+        switch (Encoding)
+        {
+            case EncodingType::UTF16LE:
+                TextData.UTF16LE = reinterpret_cast<wchar_t*>(InBuffer);
+                Length = static_cast<int>(InBufferSize / 2);
+                break;
+            case EncodingType::UTF8:
+                TextData.UTF8 = reinterpret_cast<char*>(InBuffer);
+                Length = static_cast<int>(InBufferSize / 3);
+                break;
+            default:
+                return;
+        }
     }
 
-    Length = 0;
-    Encoding = (PMX::EncodingType)0;
-}
-
-PMX::EncodingType PMX::Text::GetEncodingType()
-{
-    return Encoding;
-}
-
-size_t PMX::Text::GetBufferSize()
-{
-    switch (Encoding)
+    void Text::Delete()
     {
-        case PMX::EncodingType::UTF16LE: return (Length + 1) * 2;
-        case PMX::EncodingType::UTF8:    return (Length + 1) * 3;
+        switch (Encoding)
+        {
+            case PMX::Text::EncodingType::UTF16LE:
+                if (TextData.UTF16LE != nullptr)
+                    delete[] TextData.UTF16LE;
+                break;
+            case PMX::Text::EncodingType::UTF8:
+                if (TextData.UTF8 != nullptr)
+                    delete[] TextData.UTF8;
+                break;
+        }
 
-        default: return 0;
+        Length = 0;
+        Encoding = (PMX::Text::EncodingType)0;
     }
-}
 
-const wchar_t* PMX::Text::GetUTF16LE()
-{
-    return TextData.UTF16LE;
-}
+    PMX::Text::EncodingType PMX::Text::GetEncodingType()
+    {
+        return Encoding;
+    }
 
-const char* PMX::Text::GetUTF8()
-{
-    return TextData.UTF8;
-}
+    MemSize PMX::Text::GetBufferSize()
+    {
+        switch (Encoding)
+        {
+            case PMX::Text::EncodingType::UTF16LE: return (Length + 1) * 2;
+            case PMX::Text::EncodingType::UTF8:    return (Length + 1) * 3;
 
-int PMX::Text::GetLength()
-{
-    return Length;
+            default: return 0;
+        }
+    }
+
+    const wchar_t* Text::GetUTF16LE()
+    {
+        return TextData.UTF16LE;
+    }
+
+    const char* Text::GetUTF8()
+    {
+        return TextData.UTF8;
+    }
+
+    int Text::GetLength()
+    {
+        return Length;
+    }
 }

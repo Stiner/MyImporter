@@ -2,67 +2,70 @@
 
 #include "PMXTypes.h"
 
-/**
- * PMX Mesh Data
- */
-class PMXMeshData
+namespace PMX
 {
-public:
-    ~PMXMeshData();
+    /**
+     * PMX Mesh Data
+     */
+    class PMXMeshData
+    {
+    public:
+        ~PMXMeshData();
 
-    bool LoadBinary(const PMX::Byte* const Buffer, const size_t BufferSize);
-    void Delete();
+        bool LoadBinary(const Byte* const Buffer, const size_t BufferSize);
+        void Delete();
 
-protected:
-    void ReadText(PMX::Text* OutString, const PMX::Byte*& InOutBufferCursor);
+    protected:
+        void ReadText(Text* OutString, const Byte*& InOutBufferCursor);
 
-    bool IsValidPMXFile(const PMX::Header& Header);
+        bool IsValidPMXFile(const Header& Header);
 
-    void ReadHeader(const PMX::Byte*& InOutBufferCursor);
-    void ReadModelInfo(const PMX::Byte*& InOutBufferCursor);
-    void ReadVertices(const PMX::Byte*& InOutBufferCursor);
-    void ReadSurfaces(const PMX::Byte*& InOutBufferCursor);
-    void ReadTextures(const PMX::Byte*& InOutBufferCursor);
-    void ReadMaterials(const PMX::Byte*& InOutBufferCursor);
-    void ReadBones(const PMX::Byte*& InOutBufferCursor);
-    void ReadMorphs(const PMX::Byte*& InOutBufferCursor);
-    void ReadDisplayFrames(const PMX::Byte*& InOutBufferCursor);
-    void ReadRigidbodies(const PMX::Byte*& InOutBufferCursor);
-    void ReadJoints(const PMX::Byte*& InOutBufferCursor);
-    void ReadSoftBodies(const PMX::Byte*& InOutBufferCursor);
+        void ReadHeader(const Byte*& InOutBufferCursor);
+        void ReadModelInfo(const Byte*& InOutBufferCursor);
+        void ReadVertices(const Byte*& InOutBufferCursor);
+        void ReadSurfaces(const Byte*& InOutBufferCursor);
+        void ReadTextures(const Byte*& InOutBufferCursor);
+        void ReadMaterials(const Byte*& InOutBufferCursor);
+        void ReadBones(const Byte*& InOutBufferCursor);
+        void ReadMorphs(const Byte*& InOutBufferCursor);
+        void ReadDisplayFrames(const Byte*& InOutBufferCursor);
+        void ReadRigidbodies(const Byte*& InOutBufferCursor);
+        void ReadJoints(const Byte*& InOutBufferCursor);
+        void ReadSoftBodies(const Byte*& InOutBufferCursor);
 
-protected:
-    PMX::Header Header = { 0, };
+    protected:
+        Header HeaderData = { 0, };
 
-    PMX::ModelInfo ModelInfo;
+        ModelInfo ModelInfoData;
 
-    int VertexCount;
-    PMX::VertexData* Vertices = nullptr;
+        int VertexCount;
+        VertexData* Vertices = nullptr;
 
-    int SurfaceCount;
-    PMX::SurfaceData* Surfaces = nullptr;
+        int SurfaceCount;
+        SurfaceData* Surfaces = nullptr;
 
-    int TextureCount;
-    PMX::TextureData* Textures = nullptr;
+        int TextureCount;
+        TextureData* Textures = nullptr;
 
-    int MaterialCount;
-    PMX::MaterialData* Materials = nullptr;
+        int MaterialCount;
+        MaterialData* Materials = nullptr;
 
-    int BoneCount;
-    PMX::BoneData* Bones = nullptr;
+        int BoneCount;
+        BoneData* Bones = nullptr;
 
-    int MorphCount;
-    PMX::MorphData* Morphs = nullptr;
+        int MorphCount;
+        MorphData* Morphs = nullptr;
 
-    int DisplayFrameCount;
-    PMX::DisplayFrameData* DisplayFrames = nullptr;
+        int DisplayFrameCount;
+        DisplayFrameData* DisplayFrames = nullptr;
 
-    int RigidbodyCount;
-    PMX::RigidbodyData* Rigidbodies = nullptr;
+        int RigidbodyCount;
+        RigidbodyData* Rigidbodies = nullptr;
 
-    int JointCount;
-    PMX::JointData* Joints = nullptr;
+        int JointCount;
+        JointData* Joints = nullptr;
 
-    int SoftBodyCount;
-    PMX::SoftBodyData* SoftBodies = nullptr;
-};
+        int SoftBodyCount;
+        SoftBodyData* SoftBodies = nullptr;
+    };
+}
