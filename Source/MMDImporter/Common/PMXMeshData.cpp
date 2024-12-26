@@ -204,14 +204,14 @@ namespace PMX
 
             switch (Vertex.WeightDeformType)
             {
-                case WeightDeformType::BDEF1:
+                case VertexData::WeightDeformType::BDEF1:
                     {
                         auto& BDef1 = Vertex.WeightDeform.BDef1;
 
                         ReadIndex(&BDef1.BoneIndex0, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
                     }
                     break;
-                case WeightDeformType::BDEF2:
+                case VertexData::WeightDeformType::BDEF2:
                     {
                         auto& BDef2 = Vertex.WeightDeform.BDef2;
 
@@ -222,7 +222,7 @@ namespace PMX
                         BDef2.Weight1 = 1.0f - BDef2.Weight0;
                     }
                     break;
-                case WeightDeformType::BDEF4:
+                case VertexData::WeightDeformType::BDEF4:
                     {
                         auto& BDef4 = Vertex.WeightDeform.BDef4;
 
@@ -237,7 +237,7 @@ namespace PMX
                         ReadBuffer(&BDef4.Weight3, InOutBufferCursor, sizeof(BDef4.Weight3));
                     }
                     break;
-                case WeightDeformType::SDEF:
+                case VertexData::WeightDeformType::SDEF:
                     {
                         auto& SDef = Vertex.WeightDeform.SDef;
 
@@ -252,7 +252,7 @@ namespace PMX
                         ReadBuffer(&SDef.R1, InOutBufferCursor, sizeof(SDef.R1));
                     }
                     break;
-                case WeightDeformType::QDEF:
+                case VertexData::WeightDeformType::QDEF:
                     {
                         auto& QDef = Vertex.WeightDeform.QDef;
 
@@ -397,7 +397,7 @@ namespace PMX
 
             if (BoneData.Flags & (BoneData::IK))
             {
-                BoneIK& IKData = BoneData.IKData;
+                auto& IKData = BoneData.IKData;
 
                 ReadIndex(&IKData.TargetIndex, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
                 ReadBuffer(&IKData.LoopCount, InOutBufferCursor, sizeof(IKData.LoopCount));
@@ -406,12 +406,12 @@ namespace PMX
 
                 if (IKData.LinkCount > 0)
                 {
-                    IKData.Links = new IKLink[IKData.LinkCount];
-                    memset(IKData.Links, 0, sizeof(IKLink) * IKData.LinkCount);
+                    IKData.Links = new BoneData::BoneIK::IKLink[IKData.LinkCount];
+                    memset(IKData.Links, 0, sizeof(BoneData::BoneIK::IKLink) * IKData.LinkCount);
 
                     for (int j = 0, max = IKData.LinkCount; j < max; ++j)
                     {
-                        IKLink& LinkData = IKData.Links[j];
+                        auto& LinkData = IKData.Links[j];
 
                         ReadIndex(&LinkData.BoneIndex, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
                         ReadBuffer(&LinkData.HasLimit, InOutBufferCursor, sizeof(LinkData.HasLimit));

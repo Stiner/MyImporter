@@ -116,66 +116,6 @@ namespace PMX
         }
     };
 
-    struct BDEF1
-    {
-        int BoneIndex0 = -1;
-    };
-
-    struct BDEF2
-    {
-        int BoneIndex0 = -1;
-        int BoneIndex1 = -1;
-        float Weight0 = -1;
-        float Weight1 = -1; // = 1.0 - Weight1
-    };
-
-    struct BDEF4
-    {
-        int BoneIndex0 = -1;
-        int BoneIndex1 = -1;
-        int BoneIndex2 = -1;
-        int BoneIndex3 = -1;
-        float Weight0 = -1; // 총 가중치는 1.0을 보장하지 않음
-        float Weight1 = -1; // 총 가중치는 1.0을 보장하지 않음
-        float Weight2 = -1; // 총 가중치는 1.0을 보장하지 않음
-        float Weight3 = -1; // 총 가중치는 1.0을 보장하지 않음
-    };
-
-    // Spherical deform blending
-    struct SDEF
-    {
-        int BoneIndex0 = -1;
-        int BoneIndex1 = -1;
-        float Weight0 = -1;
-        float Weight1 = -1; // = 1.0 - Weight1
-
-        Vector3 C;  // ???
-        Vector3 R0; // ???
-        Vector3 R1; // ???
-    };
-
-    // Dual quaternion deform blending
-    struct QDEF
-    {
-        int BoneIndex0 = -1;
-        int BoneIndex1 = -1;
-        int BoneIndex2 = -1;
-        int BoneIndex3 = -1;
-        float Weight0 = -1; // 총 가중치는 1.0을 보장하지 않음
-        float Weight1 = -1; // 총 가중치는 1.0을 보장하지 않음
-        float Weight2 = -1; // 총 가중치는 1.0을 보장하지 않음
-        float Weight3 = -1; // 총 가중치는 1.0을 보장하지 않음
-    };
-
-    enum class WeightDeformType : UByte
-    {
-        BDEF1,
-        BDEF2,
-        BDEF4,
-        SDEF,
-        QDEF
-    };
-
     struct VertexData
     {
         Vector3 Position;
@@ -186,16 +126,67 @@ namespace PMX
         Vector4 Additional[4];
 
         // WeightDeformType에 따라 BDEF1..4/SDEF/QDEF 선택
-        WeightDeformType WeightDeformType = WeightDeformType::BDEF1;
+        enum class WeightDeformType : UByte
+        {
+            BDEF1,
+            BDEF2,
+            BDEF4,
+            SDEF,
+            QDEF
+        } WeightDeformType = WeightDeformType::BDEF1;
 
         union
         {
-            BDEF1 BDef1;
-            BDEF2 BDef2;
-            BDEF4 BDef4;
-            SDEF SDef;
-            QDEF QDef;
+            struct
+            {
+                int BoneIndex0 = -1;
+            } BDef1;
 
+            struct
+            {
+                int BoneIndex0 = -1;
+                int BoneIndex1 = -1;
+                float Weight0 = -1;
+                float Weight1 = -1; // = 1.0 - Weight1
+            } BDef2;
+
+            struct
+            {
+                int BoneIndex0 = -1;
+                int BoneIndex1 = -1;
+                int BoneIndex2 = -1;
+                int BoneIndex3 = -1;
+                float Weight0 = -1; // 총 가중치는 1.0을 보장하지 않음
+                float Weight1 = -1; // 총 가중치는 1.0을 보장하지 않음
+                float Weight2 = -1; // 총 가중치는 1.0을 보장하지 않음
+                float Weight3 = -1; // 총 가중치는 1.0을 보장하지 않음
+            } BDef4;
+
+            // Spherical deform blending
+            struct
+            {
+                int BoneIndex0 = -1;
+                int BoneIndex1 = -1;
+                float Weight0 = -1;
+                float Weight1 = -1; // = 1.0 - Weight1
+
+                Vector3 C;  // ???
+                Vector3 R0; // ???
+                Vector3 R1; // ???
+            } SDef;
+
+            // Dual quaternion deform blending
+            struct
+            {
+                int BoneIndex0 = -1;
+                int BoneIndex1 = -1;
+                int BoneIndex2 = -1;
+                int BoneIndex3 = -1;
+                float Weight0 = -1; // 총 가중치는 1.0을 보장하지 않음
+                float Weight1 = -1; // 총 가중치는 1.0을 보장하지 않음
+                float Weight2 = -1; // 총 가중치는 1.0을 보장하지 않음
+                float Weight3 = -1; // 총 가중치는 1.0을 보장하지 않음
+            } QDef;
         } WeightDeform = { 0 };
 
         float EdgeScale = 0;
@@ -211,37 +202,8 @@ namespace PMX
         Text Path;
     };
 
-    enum class BlendModeType : UInt8
-    {
-        Disable,
-        Multiply,
-        Additive,
-        AdditionalVec4,
-    };
-
-    enum class ToonReferenceType : UInt8
-    {
-        Texture,
-        Internal
-    };
-
     struct MaterialData
     {
-        // Bit flag
-        enum Flag : UInt8
-        {
-            NoCull        = 1 << 0, // 후면 컬링 비활성화
-            GroundShadow  = 1 << 1, // 지오메트리에 그림자 투영
-            DrawShadow    = 1 << 2, // 그림자 맵에 그리기
-            ReceiveShadow = 1 << 3, // 그림자 맵으로 부터 그림자 적용
-            HasEdge       = 1 << 4, // 연필? 아웃라인
-            VertexColor   = 1 << 5, // 추가 Vector의 첫번째 것으로 정점 색 지정
-            PointDrawing  = 1 << 6, // 정점을 점으로 표시
-            LineDrawing   = 1 << 7, // 삼각형을 선분으로 표시
-
-            // PointDrawing/LineDrawing 둘 다 설정된 경우, 점 그리기 플래그가 선 그리기 플래그보다 우선합니다.
-        };
-
         // 재료에 대한 편리한 이름(보통 일본어)
         Text NameLocal;
 
@@ -261,7 +223,19 @@ namespace PMX
         Vector3 AmbientColor;
 
         // 재료 플래그 보기
-        MaterialData::Flag DrawingFlags = (MaterialData::Flag)0;
+        enum class Flag : UInt8 // Bit flag
+        {
+            NoCull        = 1 << 0, // 후면 컬링 비활성화
+            GroundShadow  = 1 << 1, // 지오메트리에 그림자 투영
+            DrawShadow    = 1 << 2, // 그림자 맵에 그리기
+            ReceiveShadow = 1 << 3, // 그림자 맵으로 부터 그림자 적용
+            HasEdge       = 1 << 4, // 연필? 아웃라인
+            VertexColor   = 1 << 5, // 추가 Vector의 첫번째 것으로 정점 색 지정
+            PointDrawing  = 1 << 6, // 정점을 점으로 표시
+            LineDrawing   = 1 << 7, // 삼각형을 선분으로 표시
+
+            // PointDrawing/LineDrawing 둘 다 설정된 경우, 점 그리기 플래그가 선 그리기 플래그보다 우선합니다.
+        } DrawingFlags = (Flag)0;
 
         // 연필 윤곽선 가장자리의 RGBA 색상(반투명의 경우 알파)
         Vector4 EdgeColor;
@@ -281,17 +255,27 @@ namespace PMX
         //   텍스처 UV로 X 및 Y 값만 사용합니다.
         //   이는 추가 텍스처 레이어로 매핑됩니다.
         //   이는 첫 번째 추가 vec4의 다른 용도와 충돌할 수 있습니다.
-        BlendModeType EnvironmentBlendMode = (BlendModeType)-1;
+        enum class BlendModeType : UInt8
+        {
+            Disable,
+            Multiply,
+            Additive,
+            AdditionalVec4,
+        } EnvironmentBlendMode = (BlendModeType)-1;
 
         // 0 = Texture reference, 1 = internal reference
-        ToonReferenceType ToonReference = (ToonReferenceType)-1;
+        enum class ToonReferenceType : UInt8
+        {
+            Texture,
+            Internal
+        } ToonReference = (ToonReferenceType)-1;
 
         // 동작은 Toon 참조 값에 따라 달라집니다.
         // : Toon 참조 바이트가 1인 경우를 제외하고는
         //   Toon 값은 표준 텍스처 및 환경 텍스처 인덱스와 매우 유사한 텍스처 인덱스가 됩니다.
         //   1인 경우 Toon 값은 10개의 내부 Toon 텍스처 세트를 참조하는 바이트가 됩니다
         //   (대부분 구현은 "toon01.bmp" ~ "toon10.bmp"를 내부 텍스처로 사용합니다. 위의 텍스처에 대해 예약된 이름 참조).
-        Byte ToonValue = 0;
+        UInt8 ToonValue = 0;
 
         // 스크립팅이나 추가 데이터에 사용됩니다.
         Text MetaData;
@@ -303,59 +287,14 @@ namespace PMX
         int SurfaceCount = 0;
     };
 
-    struct InheritBone
-    {
-        int ParentBoneIndex = 0;
-        float ParentInfluence = 0;
-    };
-
-    struct BoneFixedAxis
-    {
-        Vector3 AxisDirection;
-    };
-
-    struct BoneLocalCoordinate
-    {
-        Vector3 XVector;
-        Vector3 ZVector;
-    };
-
-    struct BoneExternalParent
-    {
-        int ParentBoneIndex = 0;
-    };
-
-    struct IKAngleLimit
-    {
-        Vector3 Min;
-        Vector3 Max;
-    };
-
-    struct IKLink
-    {
-        int BoneIndex = 0;
-        Byte HasLimit = 0; // 1과 같으면 각도 제한을 사용합니다.
-
-        IKAngleLimit Limit = { 0 };
-    };
-
-    struct BoneIK
-    {
-        int TargetIndex = 0;
-        int LoopCount = 0;
-        float LimitRadian = 0;
-        int LinkCount = 0;
-
-        IKLink* Links = nullptr;
-
-        ~BoneIK()
-        {
-            PMX_SAFE_DELETE_ARRAY(Links);
-        }
-    };
-
     struct BoneData
     {
+        Text NameLocal;
+        Text NameUniversal;
+        Vector3 Position;
+        int ParentBoneIndex = 0;
+        int Layer = 0;
+
         enum Flag : UInt16
         {
             // 낮은 8Bit
@@ -377,14 +316,7 @@ namespace PMX
             ExternalParentDeform = 1 << 13,  // ???
             //                   = 1 << 14,  // 안씀
             //                   = 1 << 15,  // 안씀
-        };
-
-        Text NameLocal;
-        Text NameUniversal;
-        Vector3 Position;
-        int ParentBoneIndex = 0;
-        int Layer = 0;
-        BoneData::Flag Flags = (BoneData::Flag)0;
+        } Flags = (Flag)0;
 
         union
         {
@@ -393,15 +325,56 @@ namespace PMX
         } TailPosition = { 0 };
 
         // InheritRotation/InheritTranslation 플래그 중 하나가 설정된 경우 사용됩니다.
-        InheritBone InheritBoneData = { 0 };
+        struct InheritBone
+        {
+            int ParentBoneIndex = 0;
+            float ParentInfluence = 0;
+        } InheritBoneData = { 0 };
+
         // FixedAxis 플래그가 설정된 경우 사용됩니다.
-        BoneFixedAxis FixedAxisData = { 0 };
+        struct BoneFixedAxis
+        {
+            Vector3 AxisDirection;
+        } FixedAxisData = { 0 };
+
         // LocalCoordinate 플래그가 설정된 경우 사용됩니다.
-        BoneLocalCoordinate LocalCoordinateData = { 0 };
+        struct BoneLocalCoordinate
+        {
+            Vector3 XVector;
+            Vector3 ZVector;
+        } LocalCoordinateData = { 0 };
+
         // ExternalParentDeform 플래그가 설정된 경우 사용됩니다.
-        BoneExternalParent ExternalParentData = { 0 };
+        struct BoneExternalParent
+        {
+            int ParentBoneIndex = 0;
+        } ExternalParentData = { 0 };
+
         // IK 플래그가 설정된 경우 사용됩니다.
-        BoneIK IKData = { 0 };
+        struct BoneIK
+        {
+            int TargetIndex = 0;
+            int LoopCount = 0;
+            float LimitRadian = 0;
+            int LinkCount = 0;
+
+            struct IKLink
+            {
+                int BoneIndex = 0;
+                Byte HasLimit = 0; // 1과 같으면 각도 제한을 사용합니다.
+
+                struct IKAngleLimit
+                {
+                    Vector3 Min;
+                    Vector3 Max;
+                } Limit = { 0 };
+            }* Links = nullptr;
+
+            ~BoneIK()
+            {
+                PMX_SAFE_DELETE_ARRAY(Links);
+            }
+        } IKData = { 0 };
     };
 
     struct MorphData
