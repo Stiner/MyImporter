@@ -5,7 +5,7 @@
 
 namespace PMX
 {
-    void ReadBuffer(void* const OutDest, const Byte*& InOutBufferCursor, const size_t ReadSize)
+    void ReadBuffer(void* const OutDest, const Byte*& InOutBufferCursor, const PMX::MemSize ReadSize)
     {
         memcpy(OutDest, InOutBufferCursor, ReadSize);
 
@@ -43,7 +43,7 @@ namespace PMX
 
     const Byte* begin = 0;
 
-    bool PMXMeshData::LoadBinary(const Byte* const InBuffer, const size_t InBufferSize)
+    bool PMXMeshData::LoadBinary(const Byte* const InBuffer, const PMX::MemSize InBufferSize)
     {
         if (InBuffer == nullptr || InBufferSize == 0)
             return false;
@@ -376,7 +376,8 @@ namespace PMX
 
             if (BoneData.Flags & (BoneData::InheritRotation | BoneData::InheritTranslation))
             {
-                ReadBuffer(&BoneData.InheritBoneData, InOutBufferCursor, sizeof(BoneData.InheritBoneData));
+                ReadIndex(&BoneData.InheritBoneData.ParentBoneIndex, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
+                ReadBuffer(&BoneData.InheritBoneData.ParentInfluence, InOutBufferCursor, sizeof(BoneData.InheritBoneData.ParentInfluence));
             }
 
             if (BoneData.Flags & (BoneData::FixedAxis))
@@ -398,19 +399,27 @@ namespace PMX
             {
                 BoneIK& IKData = BoneData.IKData;
 
-                ReadBuffer(&IKData.TargetIndex, InOutBufferCursor, sizeof(IKData.TargetIndex));
+                ReadIndex(&IKData.TargetIndex, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
                 ReadBuffer(&IKData.LoopCount, InOutBufferCursor, sizeof(IKData.LoopCount));
                 ReadBuffer(&IKData.LimitRadian, InOutBufferCursor, sizeof(IKData.LimitRadian));
                 ReadBuffer(&IKData.LinkCount, InOutBufferCursor, sizeof(IKData.LinkCount));
 
                 if (IKData.LinkCount > 0)
                 {
-                    IKData.Links = new IKLinks[IKData.LinkCount];
-                    memset(IKData.Links, 0, sizeof(IKLinks) * IKData.LinkCount);
+                    IKData.Links = new IKLink[IKData.LinkCount];
+                    memset(IKData.Links, 0, sizeof(IKLink) * IKData.LinkCount);
 
                     for (int j = 0, max = IKData.LinkCount; j < max; ++j)
                     {
-                        ReadBuffer(&IKData.Links[j], InOutBufferCursor, sizeof(IKData.Links[j]));
+                        IKLink& LinkData = IKData.Links[j];
+
+                        ReadIndex(&LinkData.BoneIndex, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
+                        ReadBuffer(&LinkData.HasLimit, InOutBufferCursor, sizeof(LinkData.HasLimit));
+
+                        if (LinkData.HasLimit != 0)
+                        {
+                            ReadBuffer(&LinkData.Limit, InOutBufferCursor, sizeof(LinkData.Limit));
+                        }
                     }
                 }
             }

@@ -75,9 +75,9 @@ namespace PMX
 
         union
         {
-            const wchar_t* UTF16LE = nullptr;
+            const wchar_t* UTF16LE;
             const char* UTF8;
-        } TextData;
+        } TextData = { 0 };
     };
 
     struct Header
@@ -331,7 +331,7 @@ namespace PMX
         Vector3 Max;
     };
 
-    struct IKLinks
+    struct IKLink
     {
         int BoneIndex = 0;
         Byte HasLimit = 0; // 1과 같으면 각도 제한을 사용합니다.
@@ -346,7 +346,7 @@ namespace PMX
         float LimitRadian = 0;
         int LinkCount = 0;
 
-        IKLinks* Links = nullptr;
+        IKLink* Links = nullptr;
 
         ~BoneIK()
         {
