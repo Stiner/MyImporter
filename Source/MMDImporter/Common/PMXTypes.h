@@ -125,7 +125,6 @@ namespace PMX
         // Globals에 의해 갯수가 정해지며, 0개일 수 있음
         Vector4 Additional[4];
 
-        // WeightDeformType에 따라 BDEF1..4/SDEF/QDEF 선택
         enum class WeightDeformType : UByte
         {
             BDEF1,
@@ -133,63 +132,68 @@ namespace PMX
             BDEF4,
             SDEF,
             QDEF
-        } WeightDeformType = WeightDeformType::BDEF1;
+        } DeformType = (WeightDeformType)-1;
 
-        union
+        struct WeightDeform {}* Deform = nullptr;
+
+        // WeightDeformType에 따라 BDEF1..4/SDEF/QDEF 중 택1
+        struct BDEF1 : WeightDeform
         {
-            struct
-            {
-                int BoneIndex0 = -1;
-            } BDef1;
+            int BoneIndex0 = -1;
+        };
 
-            struct
-            {
-                int BoneIndex0 = -1;
-                int BoneIndex1 = -1;
-                float Weight0 = -1;
-                float Weight1 = -1; // = 1.0 - Weight1
-            } BDef2;
+        struct BDEF2 : WeightDeform
+        {
+            int BoneIndex0 = -1;
+            int BoneIndex1 = -1;
+            float Weight0 = -1;
+            float Weight1 = -1; // = 1.0 - Weight1
+        };
 
-            struct
-            {
-                int BoneIndex0 = -1;
-                int BoneIndex1 = -1;
-                int BoneIndex2 = -1;
-                int BoneIndex3 = -1;
-                float Weight0 = -1; // 총 가중치는 1.0을 보장하지 않음
-                float Weight1 = -1; // 총 가중치는 1.0을 보장하지 않음
-                float Weight2 = -1; // 총 가중치는 1.0을 보장하지 않음
-                float Weight3 = -1; // 총 가중치는 1.0을 보장하지 않음
-            } BDef4;
+        struct BDEF4 : WeightDeform
+        {
+            int BoneIndex0 = -1;
+            int BoneIndex1 = -1;
+            int BoneIndex2 = -1;
+            int BoneIndex3 = -1;
+            float Weight0 = -1; // 총 가중치는 1.0을 보장하지 않음
+            float Weight1 = -1; // 총 가중치는 1.0을 보장하지 않음
+            float Weight2 = -1; // 총 가중치는 1.0을 보장하지 않음
+            float Weight3 = -1; // 총 가중치는 1.0을 보장하지 않음
+        };
 
-            // Spherical deform blending
-            struct
-            {
-                int BoneIndex0 = -1;
-                int BoneIndex1 = -1;
-                float Weight0 = -1;
-                float Weight1 = -1; // = 1.0 - Weight1
+        // Spherical deform blending
+        struct SDEF : WeightDeform
+        {
+            int BoneIndex0 = -1;
+            int BoneIndex1 = -1;
+            float Weight0 = -1;
+            float Weight1 = -1; // = 1.0 - Weight1
 
-                Vector3 C;  // ???
-                Vector3 R0; // ???
-                Vector3 R1; // ???
-            } SDef;
+            Vector3 C;  // ???
+            Vector3 R0; // ???
+            Vector3 R1; // ???
+        };
 
-            // Dual quaternion deform blending
-            struct
-            {
-                int BoneIndex0 = -1;
-                int BoneIndex1 = -1;
-                int BoneIndex2 = -1;
-                int BoneIndex3 = -1;
-                float Weight0 = -1; // 총 가중치는 1.0을 보장하지 않음
-                float Weight1 = -1; // 총 가중치는 1.0을 보장하지 않음
-                float Weight2 = -1; // 총 가중치는 1.0을 보장하지 않음
-                float Weight3 = -1; // 총 가중치는 1.0을 보장하지 않음
-            } QDef;
-        } WeightDeform = { 0 };
+        // Dual quaternion deform blending
+        struct QDEF : WeightDeform
+        {
+            int BoneIndex0 = -1;
+            int BoneIndex1 = -1;
+            int BoneIndex2 = -1;
+            int BoneIndex3 = -1;
+            float Weight0 = -1; // 총 가중치는 1.0을 보장하지 않음
+            float Weight1 = -1; // 총 가중치는 1.0을 보장하지 않음
+            float Weight2 = -1; // 총 가중치는 1.0을 보장하지 않음
+            float Weight3 = -1; // 총 가중치는 1.0을 보장하지 않음
+        };
 
         float EdgeScale = 0;
+
+        ~VertexData()
+        {
+            PMX_SAFE_DELETE(Deform);
+        }
     };
 
     struct SurfaceData
@@ -303,7 +307,7 @@ namespace PMX
             Translatable         = 1 <<  2,  // 번역(전단)이 가능합니다.
             IsVisible            = 1 <<  3,  // ???
             Enabled              = 1 <<  4,  // ???
-            IK                   = 1 <<  5,  // 역 운동학(물리학) 사용
+            UseIK                = 1 <<  5,  // 역 운동학(물리학) 사용
             //                   = 1 <<  6,  // 안씀
             //                   = 1 <<  7,  // 안씀
 
@@ -322,59 +326,59 @@ namespace PMX
         {
             int BoneIndex;
             Vector3 Vector3;
-        } TailPosition = { 0 };
+        } TailPositionData = { 0 };
 
         // InheritRotation/InheritTranslation 플래그 중 하나가 설정된 경우 사용됩니다.
         struct InheritBone
         {
             int ParentBoneIndex = 0;
             float ParentInfluence = 0;
-        } InheritBoneData = { 0 };
+        }* InheritBoneData = nullptr;
 
         // FixedAxis 플래그가 설정된 경우 사용됩니다.
-        struct BoneFixedAxis
+        struct FixedAxis
         {
             Vector3 AxisDirection;
-        } FixedAxisData = { 0 };
+        }* FixedAxisData = nullptr;
 
         // LocalCoordinate 플래그가 설정된 경우 사용됩니다.
-        struct BoneLocalCoordinate
+        struct LocalCoordinate
         {
             Vector3 XVector;
             Vector3 ZVector;
-        } LocalCoordinateData = { 0 };
+        }* LocalCoordinateData = nullptr;
 
         // ExternalParentDeform 플래그가 설정된 경우 사용됩니다.
-        struct BoneExternalParent
+        struct ExternalParent
         {
             int ParentBoneIndex = 0;
-        } ExternalParentData = { 0 };
+        }* ExternalParentData = nullptr;
 
         // IK 플래그가 설정된 경우 사용됩니다.
-        struct BoneIK
+        struct IK
         {
             int TargetIndex = 0;
             int LoopCount = 0;
             float LimitRadian = 0;
             int LinkCount = 0;
 
-            struct IKLink
+            struct LinkData
             {
                 int BoneIndex = 0;
                 Byte HasLimit = 0; // 1과 같으면 각도 제한을 사용합니다.
 
-                struct IKAngleLimit
+                struct Limit
                 {
                     Vector3 Min;
                     Vector3 Max;
-                } Limit = { 0 };
-            }* Links = nullptr;
-
-            ~BoneIK()
-            {
-                PMX_SAFE_DELETE_ARRAY(Links);
-            }
+                } LimitData = { 0 };
+            }* LinksArray = nullptr;
         } IKData = { 0 };
+
+        ~BoneData()
+        {
+            PMX_SAFE_DELETE_ARRAY(IKData.LinksArray);
+        }
     };
 
     struct MorphData
@@ -434,15 +438,14 @@ namespace PMX
 
         struct OffsetMaterial : OffsetBase
         {
+            int MaterialIndex = 0;
+
             enum class MethodType : UInt8
             {
                 Multiply,
                 Additive
-            };
+            } OffsetMethod;
 
-            int MaterialIndex = 0;
-            // 0=곱, 1=합
-            MethodType OffsetMethod;
             Vector4 DiffuseColor;
             Vector3 SpecularColor;
             float Specularity = 0;

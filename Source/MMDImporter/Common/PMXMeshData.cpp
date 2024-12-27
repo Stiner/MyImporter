@@ -41,15 +41,12 @@ namespace PMX
         Delete();
     }
 
-    const Byte* begin = 0;
-
     bool PMXMeshData::LoadBinary(const Byte* const InBuffer, const PMX::MemSize InBufferSize)
     {
         if (InBuffer == nullptr || InBufferSize == 0)
             return false;
 
         const Byte* BufferCur = InBuffer;
-        begin = BufferCur;
 
         ReadHeader(BufferCur);
 
@@ -200,71 +197,76 @@ namespace PMX
 
             ReadBuffer(&Vertex.Additional, InOutBufferCursor, sizeof(Vertex.Additional[0]) * HeaderData.AdditionalVectorCount);
 
-            ReadBuffer(&Vertex.WeightDeformType, InOutBufferCursor, sizeof(Vertex.WeightDeformType));
+            ReadBuffer(&Vertex.DeformType, InOutBufferCursor, sizeof(Vertex.DeformType));
 
-            switch (Vertex.WeightDeformType)
+            switch (Vertex.DeformType)
             {
                 case VertexData::WeightDeformType::BDEF1:
                     {
-                        auto& BDef1 = Vertex.WeightDeform.BDef1;
+                        Vertex.Deform = new VertexData::BDEF1();
+                        VertexData::BDEF1* BDef1 = (VertexData::BDEF1*)Vertex.Deform;
 
-                        ReadIndex(&BDef1.BoneIndex0, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
+                        ReadIndex(&BDef1->BoneIndex0, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
                     }
                     break;
                 case VertexData::WeightDeformType::BDEF2:
                     {
-                        auto& BDef2 = Vertex.WeightDeform.BDef2;
+                        Vertex.Deform = new VertexData::BDEF2();
+                        VertexData::BDEF2* BDef2 = (VertexData::BDEF2*)Vertex.Deform;
 
-                        ReadIndex(&BDef2.BoneIndex0, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
-                        ReadIndex(&BDef2.BoneIndex1, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
+                        ReadIndex(&BDef2->BoneIndex0, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
+                        ReadIndex(&BDef2->BoneIndex1, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
 
-                        ReadBuffer(&BDef2.Weight0, InOutBufferCursor, sizeof(BDef2.Weight0));
-                        BDef2.Weight1 = 1.0f - BDef2.Weight0;
+                        ReadBuffer(&BDef2->Weight0, InOutBufferCursor, sizeof(BDef2->Weight0));
+                        BDef2->Weight1 = 1.0f - BDef2->Weight0;
                     }
                     break;
                 case VertexData::WeightDeformType::BDEF4:
                     {
-                        auto& BDef4 = Vertex.WeightDeform.BDef4;
+                        Vertex.Deform = new VertexData::BDEF4();
+                        VertexData::BDEF4* BDef4 = (VertexData::BDEF4*)Vertex.Deform;
 
-                        ReadIndex(&BDef4.BoneIndex0, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
-                        ReadIndex(&BDef4.BoneIndex1, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
-                        ReadIndex(&BDef4.BoneIndex2, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
-                        ReadIndex(&BDef4.BoneIndex3, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
+                        ReadIndex(&BDef4->BoneIndex0, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
+                        ReadIndex(&BDef4->BoneIndex1, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
+                        ReadIndex(&BDef4->BoneIndex2, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
+                        ReadIndex(&BDef4->BoneIndex3, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
 
-                        ReadBuffer(&BDef4.Weight0, InOutBufferCursor, sizeof(BDef4.Weight0));
-                        ReadBuffer(&BDef4.Weight1, InOutBufferCursor, sizeof(BDef4.Weight1));
-                        ReadBuffer(&BDef4.Weight2, InOutBufferCursor, sizeof(BDef4.Weight2));
-                        ReadBuffer(&BDef4.Weight3, InOutBufferCursor, sizeof(BDef4.Weight3));
+                        ReadBuffer(&BDef4->Weight0, InOutBufferCursor, sizeof(BDef4->Weight0));
+                        ReadBuffer(&BDef4->Weight1, InOutBufferCursor, sizeof(BDef4->Weight1));
+                        ReadBuffer(&BDef4->Weight2, InOutBufferCursor, sizeof(BDef4->Weight2));
+                        ReadBuffer(&BDef4->Weight3, InOutBufferCursor, sizeof(BDef4->Weight3));
                     }
                     break;
                 case VertexData::WeightDeformType::SDEF:
                     {
-                        auto& SDef = Vertex.WeightDeform.SDef;
+                        Vertex.Deform = new VertexData::SDEF();
+                        VertexData::SDEF* SDef = (VertexData::SDEF*)Vertex.Deform;
 
-                        ReadIndex(&SDef.BoneIndex0, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
-                        ReadIndex(&SDef.BoneIndex1, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
+                        ReadIndex(&SDef->BoneIndex0, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
+                        ReadIndex(&SDef->BoneIndex1, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
 
-                        ReadBuffer(&SDef.Weight0, InOutBufferCursor, sizeof(SDef.Weight0));
-                        SDef.Weight1 = 1.0f - SDef.Weight0;
+                        ReadBuffer(&SDef->Weight0, InOutBufferCursor, sizeof(SDef->Weight0));
+                        SDef->Weight1 = 1.0f - SDef->Weight0;
 
-                        ReadBuffer(&SDef.C, InOutBufferCursor, sizeof(SDef.C));
-                        ReadBuffer(&SDef.R0, InOutBufferCursor, sizeof(SDef.R0));
-                        ReadBuffer(&SDef.R1, InOutBufferCursor, sizeof(SDef.R1));
+                        ReadBuffer(&SDef->C, InOutBufferCursor, sizeof(SDef->C));
+                        ReadBuffer(&SDef->R0, InOutBufferCursor, sizeof(SDef->R0));
+                        ReadBuffer(&SDef->R1, InOutBufferCursor, sizeof(SDef->R1));
                     }
                     break;
                 case VertexData::WeightDeformType::QDEF:
                     {
-                        auto& QDef = Vertex.WeightDeform.QDef;
+                        Vertex.Deform = new VertexData::QDEF();
+                        VertexData::QDEF* QDef = (VertexData::QDEF*)Vertex.Deform;
 
-                        ReadIndex(&QDef.BoneIndex0, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
-                        ReadIndex(&QDef.BoneIndex1, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
-                        ReadIndex(&QDef.BoneIndex2, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
-                        ReadIndex(&QDef.BoneIndex3, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
+                        ReadIndex(&QDef->BoneIndex0, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
+                        ReadIndex(&QDef->BoneIndex1, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
+                        ReadIndex(&QDef->BoneIndex2, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
+                        ReadIndex(&QDef->BoneIndex3, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
 
-                        ReadBuffer(&QDef.Weight0, InOutBufferCursor, sizeof(QDef.Weight0));
-                        ReadBuffer(&QDef.Weight1, InOutBufferCursor, sizeof(QDef.Weight1));
-                        ReadBuffer(&QDef.Weight2, InOutBufferCursor, sizeof(QDef.Weight2));
-                        ReadBuffer(&QDef.Weight3, InOutBufferCursor, sizeof(QDef.Weight3));
+                        ReadBuffer(&QDef->Weight0, InOutBufferCursor, sizeof(QDef->Weight0));
+                        ReadBuffer(&QDef->Weight1, InOutBufferCursor, sizeof(QDef->Weight1));
+                        ReadBuffer(&QDef->Weight2, InOutBufferCursor, sizeof(QDef->Weight2));
+                        ReadBuffer(&QDef->Weight3, InOutBufferCursor, sizeof(QDef->Weight3));
                     }
                     break;
             }
@@ -365,60 +367,68 @@ namespace PMX
             ReadBuffer(&BoneData.Layer, InOutBufferCursor, sizeof(BoneData.Layer));
             ReadBuffer(&BoneData.Flags, InOutBufferCursor, sizeof(BoneData.Flags));
 
-            if (BoneData.Flags & BoneData::IndexedTailPosition)
+            if (BoneData.Flags & (BoneData::Flag::IndexedTailPosition))
             {
-                ReadIndex(&BoneData.TailPosition.BoneIndex, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
+                ReadIndex(&BoneData.TailPositionData.BoneIndex, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
             }
             else
             {
-                ReadBuffer(&BoneData.TailPosition.Vector3, InOutBufferCursor, sizeof(BoneData.TailPosition.Vector3));
+                ReadBuffer(&BoneData.TailPositionData.Vector3, InOutBufferCursor, sizeof(BoneData.TailPositionData.Vector3));
             }
 
-            if (BoneData.Flags & (BoneData::InheritRotation | BoneData::InheritTranslation))
+            if (BoneData.Flags & (BoneData::Flag::InheritRotation | BoneData::Flag::InheritTranslation))
             {
-                ReadIndex(&BoneData.InheritBoneData.ParentBoneIndex, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
-                ReadBuffer(&BoneData.InheritBoneData.ParentInfluence, InOutBufferCursor, sizeof(BoneData.InheritBoneData.ParentInfluence));
+                BoneData.InheritBoneData = new struct BoneData::InheritBone();
+
+                ReadIndex(&BoneData.InheritBoneData->ParentBoneIndex, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
+                ReadBuffer(&BoneData.InheritBoneData->ParentInfluence, InOutBufferCursor, sizeof(BoneData.InheritBoneData->ParentInfluence));
             }
 
-            if (BoneData.Flags & (BoneData::FixedAxis))
+            if (BoneData.Flags & (BoneData::Flag::FixedAxis))
             {
-                ReadBuffer(&BoneData.FixedAxisData, InOutBufferCursor, sizeof(BoneData.FixedAxisData));
+                BoneData.FixedAxisData = new struct BoneData::FixedAxis();
+
+                ReadBuffer(&BoneData.FixedAxisData->AxisDirection, InOutBufferCursor, sizeof(BoneData.FixedAxisData->AxisDirection));
             }
 
-            if (BoneData.Flags & (BoneData::LocalCoordinate))
+            if (BoneData.Flags & (BoneData::Flag::LocalCoordinate))
             {
-                ReadBuffer(&BoneData.LocalCoordinateData, InOutBufferCursor, sizeof(BoneData.LocalCoordinateData));
+                BoneData.LocalCoordinateData = new struct BoneData::LocalCoordinate();
+
+                ReadBuffer(&BoneData.LocalCoordinateData->XVector, InOutBufferCursor, sizeof(BoneData.LocalCoordinateData->XVector));
+                ReadBuffer(&BoneData.LocalCoordinateData->ZVector, InOutBufferCursor, sizeof(BoneData.LocalCoordinateData->ZVector));
             }
 
-            if (BoneData.Flags & (BoneData::ExternalParentDeform))
+            if (BoneData.Flags & (BoneData::Flag::ExternalParentDeform))
             {
-                ReadIndex(&BoneData.ExternalParentData.ParentBoneIndex, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
+                BoneData.ExternalParentData = new struct BoneData::ExternalParent();
+
+                ReadIndex(&BoneData.ExternalParentData->ParentBoneIndex, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
             }
 
-            if (BoneData.Flags & (BoneData::IK))
+            if (BoneData.Flags & (BoneData::Flag::UseIK))
             {
-                auto& IKData = BoneData.IKData;
+                ReadIndex(&BoneData.IKData.TargetIndex, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
+                ReadBuffer(&BoneData.IKData.LoopCount, InOutBufferCursor, sizeof(BoneData.IKData.LoopCount));
+                ReadBuffer(&BoneData.IKData.LimitRadian, InOutBufferCursor, sizeof(BoneData.IKData.LimitRadian));
+                ReadBuffer(&BoneData.IKData.LinkCount, InOutBufferCursor, sizeof(BoneData.IKData.LinkCount));
 
-                ReadIndex(&IKData.TargetIndex, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
-                ReadBuffer(&IKData.LoopCount, InOutBufferCursor, sizeof(IKData.LoopCount));
-                ReadBuffer(&IKData.LimitRadian, InOutBufferCursor, sizeof(IKData.LimitRadian));
-                ReadBuffer(&IKData.LinkCount, InOutBufferCursor, sizeof(IKData.LinkCount));
-
-                if (IKData.LinkCount > 0)
+                if (BoneData.IKData.LinkCount > 0)
                 {
-                    IKData.Links = new BoneData::BoneIK::IKLink[IKData.LinkCount];
-                    memset(IKData.Links, 0, sizeof(BoneData::BoneIK::IKLink) * IKData.LinkCount);
+                    BoneData.IKData.LinksArray = new BoneData::IK::LinkData[BoneData.IKData.LinkCount];
+                    memset(BoneData.IKData.LinksArray, 0, sizeof(BoneData::IK::LinkData) * BoneData.IKData.LinkCount);
 
-                    for (int j = 0, max = IKData.LinkCount; j < max; ++j)
+                    for (int j = 0, max = BoneData.IKData.LinkCount; j < max; ++j)
                     {
-                        auto& LinkData = IKData.Links[j];
+                        auto& LinkData = BoneData.IKData.LinksArray[j];
 
                         ReadIndex(&LinkData.BoneIndex, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
                         ReadBuffer(&LinkData.HasLimit, InOutBufferCursor, sizeof(LinkData.HasLimit));
 
                         if (LinkData.HasLimit != 0)
                         {
-                            ReadBuffer(&LinkData.Limit, InOutBufferCursor, sizeof(LinkData.Limit));
+                            ReadBuffer(&LinkData.LimitData.Min, InOutBufferCursor, sizeof(LinkData.LimitData.Min));
+                            ReadBuffer(&LinkData.LimitData.Max, InOutBufferCursor, sizeof(LinkData.LimitData.Max));
                         }
                     }
                 }
@@ -573,6 +583,7 @@ namespace PMX
 
     void PMXMeshData::ReadDisplayFrames(const Byte*& InOutBufferCursor)
     {
+
     }
 
     void PMXMeshData::ReadRigidbodies(const Byte*& InOutBufferCursor)
