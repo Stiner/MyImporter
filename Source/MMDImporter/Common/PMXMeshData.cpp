@@ -428,6 +428,147 @@ namespace PMX
 
     void PMXMeshData::ReadMorphs(const Byte*& InOutBufferCursor)
     {
+        ReadBuffer(&MorphCount, InOutBufferCursor, sizeof(MorphCount));
+
+        if (MorphCount <= 0)
+            return;
+
+        Morphs = new MorphData[MorphCount];
+        memset(Morphs, 0, sizeof(MorphData) * MorphCount);
+
+        for (int i = 0; i < MorphCount; ++i)
+        {
+            MorphData& MorphData = Morphs[i];
+
+            ReadText(&MorphData.NameLocal, InOutBufferCursor);
+            ReadText(&MorphData.NameUniversal, InOutBufferCursor);
+            ReadBuffer(&MorphData.PanelType, InOutBufferCursor, sizeof(MorphData.PanelType));
+            ReadBuffer(&MorphData.Type, InOutBufferCursor, sizeof(MorphData.Type));
+            ReadBuffer(&MorphData.OffsetCount, InOutBufferCursor, sizeof(MorphData.OffsetCount));
+
+            if (MorphData.OffsetCount > 0)
+            {
+                MorphData::OffsetBase*& Offsets = MorphData.Offsets;
+
+                switch (MorphData.Type)
+                {
+                    case MorphData::MorphType::Group:
+                        {
+                            Offsets = new MorphData::OffsetGroup[MorphData.OffsetCount];
+                            memset(Offsets, 0, sizeof(MorphData::OffsetGroup) * MorphData.OffsetCount);
+
+                            for (int j = 0; j < MorphData.OffsetCount; ++j)
+                            {
+                                MorphData::OffsetGroup& OffsetData = ((MorphData::OffsetGroup*)Offsets)[j];
+
+                                ReadIndex(&OffsetData.MorphIndex, InOutBufferCursor, IndexType::Morph, HeaderData.MorphIndexSize);
+                                ReadBuffer(&OffsetData.Rate, InOutBufferCursor, sizeof(OffsetData.Rate));
+                            }
+                        }
+                        break;
+                    case MorphData::MorphType::Vertex:
+                        {
+                            Offsets = new MorphData::OffsetVertex[MorphData.OffsetCount];
+                            memset(Offsets, 0, sizeof(MorphData::OffsetVertex) * MorphData.OffsetCount);
+
+                            for (int j = 0; j < MorphData.OffsetCount; ++j)
+                            {
+                                MorphData::OffsetVertex& OffsetData = ((MorphData::OffsetVertex*)Offsets)[j];
+
+                                ReadIndex(&OffsetData.VertexIndex, InOutBufferCursor, IndexType::Vertex, HeaderData.VertexIndexSize);
+                                ReadBuffer(&OffsetData.PositionOffset, InOutBufferCursor, sizeof(OffsetData.PositionOffset));
+                            }
+                        }
+                        break;
+                    case MorphData::MorphType::Bone:
+                        {
+                            Offsets = new MorphData::OffsetBone[MorphData.OffsetCount];
+                            memset(Offsets, 0, sizeof(MorphData::OffsetBone) * MorphData.OffsetCount);
+
+                            for (int j = 0; j < MorphData.OffsetCount; ++j)
+                            {
+                                auto& OffsetData = ((MorphData::OffsetBone*)Offsets)[j];
+
+                                ReadIndex(&OffsetData.BoneIndex, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
+                                ReadBuffer(&OffsetData.MoveValue, InOutBufferCursor, sizeof(OffsetData.MoveValue));
+                                ReadBuffer(&OffsetData.RotationValue, InOutBufferCursor, sizeof(OffsetData.RotationValue));
+                            }
+                        }
+                        break;
+                    case MorphData::MorphType::UV:
+                    case MorphData::MorphType::AdditionalUV1:
+                    case MorphData::MorphType::AdditionalUV2:
+                    case MorphData::MorphType::AdditionalUV3:
+                    case MorphData::MorphType::AdditionalUV4:
+                        {
+                            Offsets = new MorphData::OffsetUV[MorphData.OffsetCount];
+                            memset(Offsets, 0, sizeof(MorphData::OffsetUV) * MorphData.OffsetCount);
+
+                            for (int j = 0; j < MorphData.OffsetCount; ++j)
+                            {
+                                auto& OffsetData = ((MorphData::OffsetUV*)Offsets)[j];
+
+                                ReadIndex(&OffsetData.VertexIndex, InOutBufferCursor, IndexType::Vertex, HeaderData.VertexIndexSize);
+                                ReadBuffer(&OffsetData.UVOffset, InOutBufferCursor, sizeof(OffsetData.UVOffset));
+                            }
+                        }
+                        break;
+                    case MorphData::MorphType::Material:
+                        {
+                            Offsets = new MorphData::OffsetMaterial[MorphData.OffsetCount];
+                            memset(Offsets, 0, sizeof(MorphData::OffsetMaterial) * MorphData.OffsetCount);
+
+                            for (int j = 0; j < MorphData.OffsetCount; ++j)
+                            {
+                                auto& OffsetData = ((MorphData::OffsetMaterial*)Offsets)[j];
+
+                                ReadIndex(&OffsetData.MaterialIndex, InOutBufferCursor, IndexType::Material, HeaderData.MaterialIndexSize);
+                                ReadBuffer(&OffsetData.OffsetMethod, InOutBufferCursor, sizeof(OffsetData.OffsetMethod));
+                                ReadBuffer(&OffsetData.DiffuseColor, InOutBufferCursor, sizeof(OffsetData.DiffuseColor));
+                                ReadBuffer(&OffsetData.SpecularColor, InOutBufferCursor, sizeof(OffsetData.SpecularColor));
+                                ReadBuffer(&OffsetData.Specularity, InOutBufferCursor, sizeof(OffsetData.Specularity));
+                                ReadBuffer(&OffsetData.AmbientColor, InOutBufferCursor, sizeof(OffsetData.AmbientColor));
+                                ReadBuffer(&OffsetData.EdgeColor, InOutBufferCursor, sizeof(OffsetData.EdgeColor));
+                                ReadBuffer(&OffsetData.EdgeSize, InOutBufferCursor, sizeof(OffsetData.EdgeSize));
+                                ReadBuffer(&OffsetData.TextureTint, InOutBufferCursor, sizeof(OffsetData.TextureTint));
+                                ReadBuffer(&OffsetData.EnvironmentTint, InOutBufferCursor, sizeof(OffsetData.EnvironmentTint));
+                                ReadBuffer(&OffsetData.ToonTint, InOutBufferCursor, sizeof(OffsetData.ToonTint));
+                            }
+                        }
+                        break;
+                    case MorphData::MorphType::Flip:
+                        {
+                            Offsets = new MorphData::OffsetFlip[MorphData.OffsetCount];
+                            memset(Offsets, 0, sizeof(MorphData::OffsetFlip) * MorphData.OffsetCount);
+
+                            for (int j = 0; j < MorphData.OffsetCount; ++j)
+                            {
+                                auto& OffsetData = ((MorphData::OffsetFlip*)Offsets)[j];
+
+                                ReadIndex(&OffsetData.MorphIndex, InOutBufferCursor, IndexType::Morph, HeaderData.MorphIndexSize);
+                                ReadBuffer(&OffsetData.Influence, InOutBufferCursor, sizeof(OffsetData.Influence));
+                            }
+                        }
+                        break;
+                    case MorphData::MorphType::Impulse:
+                        {
+                            Offsets = new MorphData::OffsetImpulse[MorphData.OffsetCount];
+                            memset(Offsets, 0, sizeof(MorphData::OffsetImpulse) * MorphData.OffsetCount);
+
+                            for (int j = 0; j < MorphData.OffsetCount; ++j)
+                            {
+                                auto& OffsetData = ((MorphData::OffsetImpulse*)Offsets)[j];
+
+                                ReadIndex(&OffsetData.RigidbodyIndex, InOutBufferCursor, IndexType::Rigidbody, HeaderData.RigidbodyIndexSize);
+                                ReadBuffer(&OffsetData.LocalFlag, InOutBufferCursor, sizeof(OffsetData.LocalFlag));
+                                ReadBuffer(&OffsetData.MovementSpeed, InOutBufferCursor, sizeof(OffsetData.MovementSpeed));
+                                ReadBuffer(&OffsetData.RotationTorque, InOutBufferCursor, sizeof(OffsetData.RotationTorque));
+                            }
+                        }
+                        break;
+                }
+            }
+        }
     }
 
     void PMXMeshData::ReadDisplayFrames(const Byte*& InOutBufferCursor)

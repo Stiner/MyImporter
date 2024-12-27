@@ -379,6 +379,99 @@ namespace PMX
 
     struct MorphData
     {
+        Text NameLocal;
+        Text NameUniversal;
+
+        //　뭔지 모르겠음. 힌트 : https://gist.github.com/felixjones/f8a06bd48f9da9a4539f?permalink_comment_id=2751718#gistcomment-2751718
+        UInt8 PanelType = 0;
+
+        enum class MorphType : UInt8
+        {
+            Group,
+            Vertex,
+            Bone,
+            UV,
+            AdditionalUV1,
+            AdditionalUV2,
+            AdditionalUV3,
+            AdditionalUV4,
+            Material,
+            Flip,
+            Impulse,
+        } Type = (MorphType)-1;
+
+        int OffsetCount = 0;
+
+        struct OffsetBase
+        {
+        }* Offsets = nullptr;
+
+        struct OffsetGroup : OffsetBase
+        {
+            int MorphIndex = 0;
+            float Rate = 0;
+        };
+
+        struct OffsetVertex : OffsetBase
+        {
+            int VertexIndex = 0;
+            Vector3 PositionOffset;
+        };
+
+        struct OffsetBone : OffsetBase
+        {
+            int BoneIndex = 0;
+            Vector3 MoveValue;
+            Vector4 RotationValue;
+        };
+
+        // UV, AddtionalUV1~4 공통
+        struct OffsetUV : OffsetBase
+        {
+            int VertexIndex = 0;
+            Vector4 UVOffset;
+        };
+
+        struct OffsetMaterial : OffsetBase
+        {
+            enum class MethodType : UInt8
+            {
+                Multiply,
+                Additive
+            };
+
+            int MaterialIndex = 0;
+            // 0=곱, 1=합
+            MethodType OffsetMethod;
+            Vector4 DiffuseColor;
+            Vector3 SpecularColor;
+            float Specularity = 0;
+            Vector3 AmbientColor;
+            Vector4 EdgeColor;
+            float EdgeSize = 0;
+            Vector4 TextureTint;
+            Vector4 EnvironmentTint;
+            Vector4 ToonTint;
+        };
+
+        struct OffsetFlip : OffsetBase
+        {
+            int MorphIndex = 0;
+            float Influence = 0;
+        };
+
+        struct OffsetImpulse : OffsetBase
+        {
+            int RigidbodyIndex = 0;
+            UInt8 LocalFlag = 0;
+            Vector3 MovementSpeed;
+            Vector3 RotationTorque;
+        };
+
+        ~MorphData()
+        {
+            PMX_SAFE_DELETE_ARRAY(Offsets);
+        }
     };
 
     struct DisplayFrameData
