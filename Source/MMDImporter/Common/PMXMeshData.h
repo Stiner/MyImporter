@@ -12,7 +12,7 @@ namespace PMX
     public:
         ~PMXMeshData();
 
-        bool LoadBinary(const Byte* const Buffer, const size_t BufferSize);
+        bool LoadBinary(const Byte* const InBuffer, const PMX::MemSize InBufferSize);
         void Delete();
 
     protected:
