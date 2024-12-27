@@ -320,8 +320,8 @@ namespace PMX
 
         union
         {
-            Vector3 Vector3;
             int BoneIndex;
+            Vector3 Vector3;
         } TailPosition = { 0 };
 
         // InheritRotation/InheritTranslation 플래그 중 하나가 설정된 경우 사용됩니다.
