@@ -35,6 +35,7 @@ namespace PMX
                 break;
         }
 
+        TextData = { 0 };
         Length = 0;
         Encoding = (PMX::Text::EncodingType)0;
     }
