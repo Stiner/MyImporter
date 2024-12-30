@@ -89,34 +89,34 @@ namespace PMX
     {
         ModelInfoData.Delete();
 
-        PMX_SAFE_DELETE_ARRAY(Vertices);
+        PMX_SAFE_DELETE_ARRAY(ArrayVertex);
         VertexCount = 0;
 
-        PMX_SAFE_DELETE_ARRAY(Surfaces);
+        PMX_SAFE_DELETE_ARRAY(ArraySurface);
         SurfaceCount = 0;
 
-        PMX_SAFE_DELETE_ARRAY(Textures);
+        PMX_SAFE_DELETE_ARRAY(ArrayTexture);
         TextureCount = 0;
 
-        PMX_SAFE_DELETE_ARRAY(Materials);
+        PMX_SAFE_DELETE_ARRAY(ArrayMaterial);
         MaterialCount = 0;
 
-        PMX_SAFE_DELETE_ARRAY(Bones);
+        PMX_SAFE_DELETE_ARRAY(ArrayBone);
         BoneCount = 0;
 
-        PMX_SAFE_DELETE_ARRAY(Morphs);
+        PMX_SAFE_DELETE_ARRAY(ArrayMorph);
         MorphCount = 0;
 
-        PMX_SAFE_DELETE_ARRAY(DisplayFrames);
+        PMX_SAFE_DELETE_ARRAY(ArrayDisplayFrame);
         DisplayFrameCount = 0;
 
-        PMX_SAFE_DELETE_ARRAY(Rigidbodies);
+        PMX_SAFE_DELETE_ARRAY(ArrayRigidbody);
         RigidbodyCount = 0;
 
-        PMX_SAFE_DELETE_ARRAY(Joints);
+        PMX_SAFE_DELETE_ARRAY(ArrayJoint);
         JointCount = 0;
 
-        PMX_SAFE_DELETE_ARRAY(SoftBodies);
+        PMX_SAFE_DELETE_ARRAY(ArraySoftBody);
         SoftBodyCount = 0;
     }
 
@@ -184,12 +184,12 @@ namespace PMX
         if (VertexCount <= 0)
             return;
 
-        Vertices = new VertexData[VertexCount];
-        memset(Vertices, 0, sizeof(VertexData) * VertexCount);
+        ArrayVertex = new VertexData[VertexCount];
+        memset(ArrayVertex, 0, sizeof(VertexData) * VertexCount);
 
         for (int i = 0; i < VertexCount; ++i)
         {
-            VertexData& Vertex = Vertices[i];
+            VertexData& Vertex = ArrayVertex[i];
 
             ReadBuffer(&Vertex.Position, InOutBufferCursor, sizeof(Vertex.Position));
             ReadBuffer(&Vertex.Normal, InOutBufferCursor, sizeof(Vertex.Normal));
@@ -286,14 +286,14 @@ namespace PMX
         // 3개로 하나의 삼각형 구성
         SurfaceCount = IndexCount / 3;
 
-        Surfaces = new SurfaceData[SurfaceCount];
-        memset(Surfaces, 0, sizeof(SurfaceData) * SurfaceCount);
+        ArraySurface = new SurfaceData[SurfaceCount];
+        memset(ArraySurface, 0, sizeof(SurfaceData) * SurfaceCount);
 
         for (int i = 0; i < SurfaceCount; ++i)
         {
-            ReadIndex(&Surfaces[i].VertexIndex[0], InOutBufferCursor, IndexType::Vertex, HeaderData.VertexIndexSize);
-            ReadIndex(&Surfaces[i].VertexIndex[1], InOutBufferCursor, IndexType::Vertex, HeaderData.VertexIndexSize);
-            ReadIndex(&Surfaces[i].VertexIndex[2], InOutBufferCursor, IndexType::Vertex, HeaderData.VertexIndexSize);
+            ReadIndex(&ArraySurface[i].VertexIndex[0], InOutBufferCursor, IndexType::Vertex, HeaderData.VertexIndexSize);
+            ReadIndex(&ArraySurface[i].VertexIndex[1], InOutBufferCursor, IndexType::Vertex, HeaderData.VertexIndexSize);
+            ReadIndex(&ArraySurface[i].VertexIndex[2], InOutBufferCursor, IndexType::Vertex, HeaderData.VertexIndexSize);
         }
     }
 
@@ -304,12 +304,12 @@ namespace PMX
         if (TextureCount <= 0)
             return;
 
-        Textures = new TextureData[TextureCount];
-        memset(Textures, 0, sizeof(TextureData) * TextureCount);
+        ArrayTexture = new TextureData[TextureCount];
+        memset(ArrayTexture, 0, sizeof(TextureData) * TextureCount);
 
         for (int i = 0; i < TextureCount; ++i)
         {
-            ReadText(&Textures[i].Path, InOutBufferCursor);
+            ReadText(&ArrayTexture[i].Path, InOutBufferCursor);
         }
     }
 
@@ -320,12 +320,12 @@ namespace PMX
         if (MaterialCount <= 0)
             return;
 
-        Materials = new MaterialData[MaterialCount];
-        memset(Materials, 0, sizeof(MaterialData) * MaterialCount);
+        ArrayMaterial = new MaterialData[MaterialCount];
+        memset(ArrayMaterial, 0, sizeof(MaterialData) * MaterialCount);
 
         for (int i = 0; i < MaterialCount; ++i)
         {
-            MaterialData& MaterialData = Materials[i];
+            MaterialData& MaterialData = ArrayMaterial[i];
 
             ReadText(&MaterialData.NameLocal, InOutBufferCursor);
             ReadText(&MaterialData.NameUniversal, InOutBufferCursor);
@@ -353,12 +353,12 @@ namespace PMX
         if (BoneCount <= 0)
             return;
 
-        Bones = new BoneData[BoneCount];
-        memset(Bones, 0, sizeof(BoneData) * BoneCount);
+        ArrayBone = new BoneData[BoneCount];
+        memset(ArrayBone, 0, sizeof(BoneData) * BoneCount);
 
         for (int i = 0; i < BoneCount; ++i)
         {
-            BoneData& BoneData = Bones[i];
+            BoneData& BoneData = ArrayBone[i];
 
             ReadText(&BoneData.NameLocal, InOutBufferCursor);
             ReadText(&BoneData.NameUniversal, InOutBufferCursor);
@@ -443,12 +443,12 @@ namespace PMX
         if (MorphCount <= 0)
             return;
 
-        Morphs = new MorphData[MorphCount];
-        memset(Morphs, 0, sizeof(MorphData) * MorphCount);
+        ArrayMorph = new MorphData[MorphCount];
+        memset(ArrayMorph, 0, sizeof(MorphData) * MorphCount);
 
         for (int i = 0; i < MorphCount; ++i)
         {
-            MorphData& MorphData = Morphs[i];
+            MorphData& MorphData = ArrayMorph[i];
 
             ReadText(&MorphData.NameLocal, InOutBufferCursor);
             ReadText(&MorphData.NameUniversal, InOutBufferCursor);
