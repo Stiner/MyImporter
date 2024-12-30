@@ -415,12 +415,12 @@ namespace PMX
 
                 if (BoneData.IKData.LinkCount > 0)
                 {
-                    BoneData.IKData.LinksArray = new BoneData::IK::LinkData[BoneData.IKData.LinkCount];
-                    memset(BoneData.IKData.LinksArray, 0, sizeof(BoneData::IK::LinkData) * BoneData.IKData.LinkCount);
+                    BoneData.IKData.ArrayLink = new BoneData::IK::LinkData[BoneData.IKData.LinkCount];
+                    memset(BoneData.IKData.ArrayLink, 0, sizeof(BoneData::IK::LinkData) * BoneData.IKData.LinkCount);
 
                     for (int j = 0, max = BoneData.IKData.LinkCount; j < max; ++j)
                     {
-                        auto& LinkData = BoneData.IKData.LinksArray[j];
+                        auto& LinkData = BoneData.IKData.ArrayLink[j];
 
                         ReadIndex(&LinkData.BoneIndex, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
                         ReadBuffer(&LinkData.HasLimit, InOutBufferCursor, sizeof(LinkData.HasLimit));
@@ -458,7 +458,7 @@ namespace PMX
 
             if (MorphData.OffsetCount > 0)
             {
-                MorphData::OffsetBase*& Offsets = MorphData.Offsets;
+                MorphData::OffsetBase*& Offsets = MorphData.ArrayOffset;
 
                 switch (MorphData.Type)
                 {

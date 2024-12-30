@@ -372,12 +372,12 @@ namespace PMX
                     Vector3 Min;
                     Vector3 Max;
                 } LimitData = { 0 };
-            }* LinksArray = nullptr;
+            }* ArrayLink = nullptr;
         } IKData = { 0 };
 
         ~BoneData()
         {
-            PMX_SAFE_DELETE_ARRAY(IKData.LinksArray);
+            PMX_SAFE_DELETE_ARRAY(IKData.ArrayLink);
         }
     };
 
@@ -408,7 +408,7 @@ namespace PMX
 
         struct OffsetBase
         {
-        }* Offsets = nullptr;
+        }* ArrayOffset = nullptr;
 
         struct OffsetGroup : OffsetBase
         {
@@ -473,7 +473,7 @@ namespace PMX
 
         ~MorphData()
         {
-            PMX_SAFE_DELETE_ARRAY(Offsets);
+            PMX_SAFE_DELETE_ARRAY(ArrayOffset);
         }
     };
 
