@@ -308,7 +308,7 @@ namespace PMX
             IsVisible            = 1 <<  3,  // ???
             Enabled              = 1 <<  4,  // ???
             UseIK                = 1 <<  5,  // 역 운동학(물리학) 사용
-            //                   = 1 <<  6,  // 안씀
+            //                   = 1 <<  6,  // 뭔가 쓰는 것 같은데 확인 필요 : https://gist.github.com/felixjones/f8a06bd48f9da9a4539f?permalink_comment_id=4559705#gistcomment-4559705
             //                   = 1 <<  7,  // 안씀
 
             // 높은 8bit
