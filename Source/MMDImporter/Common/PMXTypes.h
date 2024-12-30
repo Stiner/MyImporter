@@ -479,6 +479,26 @@ namespace PMX
 
     struct DisplayFrameData
     {
+        Text NameLocal;
+        Text NameUniversal;
+        UInt8 SpecialFlag = 0;
+        int FrameCount = 0;
+
+        struct Frame
+        {
+            enum class FrameType : UInt8
+            {
+                Bone,
+                Morph
+            } Type;
+
+            int Index;
+        }* ArrayFrame = nullptr;
+
+        ~DisplayFrameData()
+        {
+            PMX_SAFE_DELETE_ARRAY(ArrayFrame);
+        }
     };
 
     struct RigidbodyData

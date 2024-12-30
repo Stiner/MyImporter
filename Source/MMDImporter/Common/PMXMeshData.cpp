@@ -583,7 +583,49 @@ namespace PMX
 
     void PMXMeshData::ReadDisplayFrames(const Byte*& InOutBufferCursor)
     {
+        ReadBuffer(&DisplayFrameCount, InOutBufferCursor, sizeof(DisplayFrameCount));
 
+        if (DisplayFrameCount <= 0)
+            return;
+
+        ArrayDisplayFrame = new DisplayFrameData[DisplayFrameCount];
+        memset(ArrayDisplayFrame, 0, sizeof(DisplayFrameData) * DisplayFrameCount);
+
+        for (int i = 0, max = DisplayFrameCount; i < max; ++i)
+        {
+            DisplayFrameData& DisplayFrameData = ArrayDisplayFrame[i];
+
+            ReadText(&DisplayFrameData.NameLocal, InOutBufferCursor);
+            ReadText(&DisplayFrameData.NameUniversal, InOutBufferCursor);
+
+            ReadBuffer(&DisplayFrameData.SpecialFlag, InOutBufferCursor, sizeof(DisplayFrameData.SpecialFlag));
+
+            ReadBuffer(&DisplayFrameData.FrameCount, InOutBufferCursor, sizeof(DisplayFrameData.FrameCount));
+
+            if (DisplayFrameData.FrameCount > 0)
+            {
+                DisplayFrameData.ArrayFrame = new DisplayFrameData::Frame[DisplayFrameData.FrameCount];
+                memset(DisplayFrameData.ArrayFrame, 0, sizeof(DisplayFrameData::Frame) * DisplayFrameData.FrameCount);
+
+                for (int j = 0, max = DisplayFrameData.FrameCount; j < max; ++j)
+                {
+                    DisplayFrameData::Frame& FrameData = DisplayFrameData.ArrayFrame[j];
+
+                    ReadBuffer(&FrameData.Type, InOutBufferCursor, sizeof(FrameData.Type));
+
+                    switch (FrameData.Type)
+                    {
+                        case DisplayFrameData::Frame::FrameType::Bone:
+                            ReadIndex(&FrameData.Index, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
+                            break;
+
+                        case DisplayFrameData::Frame::FrameType::Morph:
+                            ReadIndex(&FrameData.Index, InOutBufferCursor, IndexType::Morph, HeaderData.MorphIndexSize);
+                            break;
+                    }
+                }
+            }
+        }
     }
 
     void PMXMeshData::ReadRigidbodies(const Byte*& InOutBufferCursor)
