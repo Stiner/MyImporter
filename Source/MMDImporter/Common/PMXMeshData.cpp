@@ -630,6 +630,38 @@ namespace PMX
 
     void PMXMeshData::ReadRigidbodies(const Byte*& InOutBufferCursor)
     {
+        ReadBuffer(&RigidbodyCount, InOutBufferCursor, sizeof(RigidbodyCount));
+
+        if (RigidbodyCount <= 0)
+            return;
+
+        ArrayRigidbody = new RigidbodyData[RigidbodyCount];
+        memset(ArrayRigidbody, 0, sizeof(RigidbodyData) * RigidbodyCount);
+
+        for (int i = 0, max = RigidbodyCount; i < max; ++i)
+        {
+            RigidbodyData& RigidbodyData = ArrayRigidbody[i];
+
+            ReadText(&RigidbodyData.NameLocal, InOutBufferCursor);
+            ReadText(&RigidbodyData.NameUniversal, InOutBufferCursor);
+
+            ReadIndex(&RigidbodyData.BoneIndexRelated, InOutBufferCursor, IndexType::Bone, HeaderData.BoneIndexSize);
+
+            ReadBuffer(&RigidbodyData.GroupID, InOutBufferCursor, sizeof(RigidbodyData.GroupID));
+            ReadBuffer(&RigidbodyData.NonCollisionGroupMask, InOutBufferCursor, sizeof(RigidbodyData.NonCollisionGroupMask));
+
+            ReadBuffer(&RigidbodyData.ShapeType, InOutBufferCursor, sizeof(RigidbodyData.ShapeType));
+            ReadBuffer(&RigidbodyData.ShapeSize, InOutBufferCursor, sizeof(RigidbodyData.ShapeSize));
+            ReadBuffer(&RigidbodyData.ShapePosition, InOutBufferCursor, sizeof(RigidbodyData.ShapePosition));
+            ReadBuffer(&RigidbodyData.ShapeRotation, InOutBufferCursor, sizeof(RigidbodyData.ShapeRotation));
+
+            ReadBuffer(&RigidbodyData.Mass, InOutBufferCursor, sizeof(RigidbodyData.Mass));
+            ReadBuffer(&RigidbodyData.MoveAttenuation, InOutBufferCursor, sizeof(RigidbodyData.MoveAttenuation));
+            ReadBuffer(&RigidbodyData.RotationDamping, InOutBufferCursor, sizeof(RigidbodyData.RotationDamping));
+            ReadBuffer(&RigidbodyData.Repulsion, InOutBufferCursor, sizeof(RigidbodyData.Repulsion));
+            ReadBuffer(&RigidbodyData.FrictionForce, InOutBufferCursor, sizeof(RigidbodyData.FrictionForce));
+            ReadBuffer(&RigidbodyData.PhysicsMode, InOutBufferCursor, sizeof(RigidbodyData.PhysicsMode));
+        }
     }
 
     void PMXMeshData::ReadJoints(const Byte*& InOutBufferCursor)

@@ -503,6 +503,39 @@ namespace PMX
 
     struct RigidbodyData
     {
+        Text NameLocal;
+        Text NameUniversal;
+        int BoneIndexRelated = 0;
+        UInt8 GroupID = 0;
+
+        // 비트 마스크. 각 비트 인덱스값이 그룹ID가 됨.
+        // 예) 0001000000000001 라면 그룹ID 값은 4,16.
+        //     4,16 그룹과는 충돌하지 않음.
+        UInt16 NonCollisionGroupMask = 0;
+
+        enum class ShapeType : UInt8
+        {
+            Sphere,
+            Box,
+            Capsule
+        } ShapeType = (enum class ShapeType)-1;
+
+        Vector3 ShapeSize;
+        Vector3 ShapePosition;
+        Vector3 ShapeRotation;
+
+        float Mass = 0;
+        float MoveAttenuation = 0;
+        float RotationDamping = 0;
+        float Repulsion = 0;
+        float FrictionForce = 0;
+        
+        enum class PhysicsMode : UInt8
+        {
+            FollowBone,
+            Physics,
+            PhysicsBone
+        } PhysicsMode = (enum class PhysicsMode)-1;
     };
 
     struct JointData
