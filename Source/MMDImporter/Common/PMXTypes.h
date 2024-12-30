@@ -540,6 +540,29 @@ namespace PMX
 
     struct JointData
     {
+        Text NameLocal;
+        Text NameUniversal;
+
+        enum class JointType : UInt8
+        {
+            Spring6DOF, // 2.0
+            _6DOF,      // 2.1
+            P2P,        // 2.1
+            ConeTwist,  // 2.1
+            Slider,     // 2.1
+            Hinge,      // 2.1
+        } Type;
+
+        int RigidbodyIndexA;
+        int RigidbodyIndexB;
+        Vector3 Position;
+        Vector3 Rotation;
+        Vector3 PositionMin;
+        Vector3 PositionMax;
+        Vector3 RotationMin;
+        Vector3 RotationMax;
+        Vector3 PositionSpring;
+        Vector3 RotationSpring;
     };
 
     struct SoftBodyData

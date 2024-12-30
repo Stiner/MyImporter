@@ -666,6 +666,33 @@ namespace PMX
 
     void PMXMeshData::ReadJoints(const Byte*& InOutBufferCursor)
     {
+        ReadBuffer(&JointCount, InOutBufferCursor, sizeof(JointCount));
+
+        if (JointCount <= 0)
+            return;
+
+        ArrayJoint = new JointData[JointCount];
+        memset(ArrayJoint, 0, sizeof(JointData) * JointCount);
+
+        for (int i = 0, max = JointCount; i < max; ++i)
+        {
+            JointData& JointData = ArrayJoint[i];
+
+            ReadText(&JointData.NameLocal, InOutBufferCursor);
+            ReadText(&JointData.NameUniversal, InOutBufferCursor);
+
+            ReadBuffer(&JointData.Type, InOutBufferCursor, sizeof(JointData.Type));
+            ReadIndex(&JointData.RigidbodyIndexA, InOutBufferCursor, IndexType::Rigidbody, HeaderData.RigidbodyIndexSize);
+            ReadIndex(&JointData.RigidbodyIndexB, InOutBufferCursor, IndexType::Rigidbody, HeaderData.RigidbodyIndexSize);
+            ReadBuffer(&JointData.Position, InOutBufferCursor, sizeof(JointData.Position));
+            ReadBuffer(&JointData.Rotation, InOutBufferCursor, sizeof(JointData.Rotation));
+            ReadBuffer(&JointData.PositionMin, InOutBufferCursor, sizeof(JointData.PositionMin));
+            ReadBuffer(&JointData.PositionMax, InOutBufferCursor, sizeof(JointData.PositionMax));
+            ReadBuffer(&JointData.RotationMin, InOutBufferCursor, sizeof(JointData.RotationMin));
+            ReadBuffer(&JointData.RotationMax, InOutBufferCursor, sizeof(JointData.RotationMax));
+            ReadBuffer(&JointData.PositionSpring, InOutBufferCursor, sizeof(JointData.PositionSpring));
+            ReadBuffer(&JointData.RotationSpring, InOutBufferCursor, sizeof(JointData.RotationSpring));
+        }
     }
 
     void PMXMeshData::ReadSoftBodies(const Byte*& InOutBufferCursor)
