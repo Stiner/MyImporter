@@ -36,6 +36,13 @@ namespace PMX
         }
     }
 
+    template <class T>
+    T* AllocDataArray(int Size)
+    {
+        T* Array = new T[Size];
+        return reinterpret_cast<T>(memset(Array, 0, sizeof(T) * Size));
+    }
+
     PMXMeshData::~PMXMeshData()
     {
         Delete();
@@ -184,8 +191,7 @@ namespace PMX
         if (VertexCount <= 0)
             return;
 
-        ArrayVertex = new VertexData[VertexCount];
-        memset(ArrayVertex, 0, sizeof(VertexData) * VertexCount);
+        ArrayVertex = AllocDataArray<VertexData>(VertexCount);
 
         for (int i = 0; i < VertexCount; ++i)
         {
@@ -286,8 +292,7 @@ namespace PMX
         // 3개로 하나의 삼각형 구성
         SurfaceCount = IndexCount / 3;
 
-        ArraySurface = new SurfaceData[SurfaceCount];
-        memset(ArraySurface, 0, sizeof(SurfaceData) * SurfaceCount);
+        ArraySurface = AllocDataArray<SurfaceData>(SurfaceCount);
 
         for (int i = 0; i < SurfaceCount; ++i)
         {
@@ -304,8 +309,7 @@ namespace PMX
         if (TextureCount <= 0)
             return;
 
-        ArrayTexture = new TextureData[TextureCount];
-        memset(ArrayTexture, 0, sizeof(TextureData) * TextureCount);
+        ArrayTexture = AllocDataArray<TextureData>(TextureCount);
 
         for (int i = 0; i < TextureCount; ++i)
         {
@@ -320,8 +324,7 @@ namespace PMX
         if (MaterialCount <= 0)
             return;
 
-        ArrayMaterial = new MaterialData[MaterialCount];
-        memset(ArrayMaterial, 0, sizeof(MaterialData) * MaterialCount);
+        ArrayMaterial = AllocDataArray<MaterialData>(MaterialCount);
 
         for (int i = 0; i < MaterialCount; ++i)
         {
@@ -353,8 +356,7 @@ namespace PMX
         if (BoneCount <= 0)
             return;
 
-        ArrayBone = new BoneData[BoneCount];
-        memset(ArrayBone, 0, sizeof(BoneData) * BoneCount);
+        ArrayBone = AllocDataArray<BoneData>(BoneCount);
 
         for (int i = 0; i < BoneCount; ++i)
         {
@@ -443,8 +445,7 @@ namespace PMX
         if (MorphCount <= 0)
             return;
 
-        ArrayMorph = new MorphData[MorphCount];
-        memset(ArrayMorph, 0, sizeof(MorphData) * MorphCount);
+        ArrayMorph = AllocDataArray<MorphData>(MorphCount);
 
         for (int i = 0; i < MorphCount; ++i)
         {
@@ -588,8 +589,7 @@ namespace PMX
         if (DisplayFrameCount <= 0)
             return;
 
-        ArrayDisplayFrame = new DisplayFrameData[DisplayFrameCount];
-        memset(ArrayDisplayFrame, 0, sizeof(DisplayFrameData) * DisplayFrameCount);
+        ArrayDisplayFrame = AllocDataArray<DisplayFrameData>(DisplayFrameCount);
 
         for (int i = 0, max = DisplayFrameCount; i < max; ++i)
         {
@@ -635,8 +635,7 @@ namespace PMX
         if (RigidbodyCount <= 0)
             return;
 
-        ArrayRigidbody = new RigidbodyData[RigidbodyCount];
-        memset(ArrayRigidbody, 0, sizeof(RigidbodyData) * RigidbodyCount);
+        ArrayRigidbody = AllocDataArray<RigidbodyData>(RigidbodyCount);
 
         for (int i = 0, max = RigidbodyCount; i < max; ++i)
         {
@@ -671,8 +670,7 @@ namespace PMX
         if (JointCount <= 0)
             return;
 
-        ArrayJoint = new JointData[JointCount];
-        memset(ArrayJoint, 0, sizeof(JointData) * JointCount);
+        ArrayJoint = AllocDataArray<JointData>(JointCount);
 
         for (int i = 0, max = JointCount; i < max; ++i)
         {
