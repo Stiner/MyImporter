@@ -698,5 +698,61 @@ namespace PMX
 
     void PMXMeshData::ReadSoftBodies(const Byte*& InOutBufferCursor)
     {
+        ReadBuffer(&SoftBodyCount, InOutBufferCursor, sizeof(SoftBodyCount));
+
+        if (SoftBodyCount <= 0)
+            return;
+
+        ArraySoftBody = AllocDataArray<SoftBodyData>(SoftBodyCount);
+
+        for (int i = 0, max = SoftBodyCount; i < max; ++i)
+        {
+            SoftBodyData& SoftBodyData = ArraySoftBody[i];
+
+            ReadText(&SoftBodyData.NameLocal, InOutBufferCursor);
+            ReadText(&SoftBodyData.NameUniversal, InOutBufferCursor);
+            ReadBuffer(&SoftBodyData.Shape, InOutBufferCursor, sizeof(SoftBodyData.Shape));
+            ReadIndex(&SoftBodyData.MaterialIndex, InOutBufferCursor, IndexType::Material, HeaderData.MaterialIndexSize);
+            ReadBuffer(&SoftBodyData.Group, InOutBufferCursor, sizeof(SoftBodyData.Group));
+            ReadBuffer(&SoftBodyData.NonCollisionGroupMask, InOutBufferCursor, sizeof(SoftBodyData.NonCollisionGroupMask));
+            ReadBuffer(&SoftBodyData.B_LinkCreateDistance, InOutBufferCursor, sizeof(SoftBodyData.B_LinkCreateDistance));
+            ReadBuffer(&SoftBodyData.NumberOfClusters, InOutBufferCursor, sizeof(SoftBodyData.NumberOfClusters));
+            ReadBuffer(&SoftBodyData.TotalMass, InOutBufferCursor, sizeof(SoftBodyData.TotalMass));
+            ReadBuffer(&SoftBodyData.CollisionMargin, InOutBufferCursor, sizeof(SoftBodyData.CollisionMargin));
+            ReadBuffer(&SoftBodyData.AerodynamicsModel, InOutBufferCursor, sizeof(SoftBodyData.AerodynamicsModel));
+            ReadBuffer(&SoftBodyData.ConfigVCF, InOutBufferCursor, sizeof(SoftBodyData.ConfigVCF));
+            ReadBuffer(&SoftBodyData.ConfigDP, InOutBufferCursor, sizeof(SoftBodyData.ConfigDP));
+            ReadBuffer(&SoftBodyData.ConfigDG, InOutBufferCursor, sizeof(SoftBodyData.ConfigDG));
+            ReadBuffer(&SoftBodyData.ConfigLF, InOutBufferCursor, sizeof(SoftBodyData.ConfigLF));
+            ReadBuffer(&SoftBodyData.ConfigPR, InOutBufferCursor, sizeof(SoftBodyData.ConfigPR));
+            ReadBuffer(&SoftBodyData.ConfigVC, InOutBufferCursor, sizeof(SoftBodyData.ConfigVC));
+            ReadBuffer(&SoftBodyData.ConfigDF, InOutBufferCursor, sizeof(SoftBodyData.ConfigDF));
+            ReadBuffer(&SoftBodyData.ConfigMT, InOutBufferCursor, sizeof(SoftBodyData.ConfigMT));
+            ReadBuffer(&SoftBodyData.ConfigCHR, InOutBufferCursor, sizeof(SoftBodyData.ConfigCHR));
+            ReadBuffer(&SoftBodyData.ConfigKHR, InOutBufferCursor, sizeof(SoftBodyData.ConfigKHR));
+            ReadBuffer(&SoftBodyData.ConfigSHR, InOutBufferCursor, sizeof(SoftBodyData.ConfigSHR));
+            ReadBuffer(&SoftBodyData.ConfigAHR, InOutBufferCursor, sizeof(SoftBodyData.ConfigAHR));
+            ReadBuffer(&SoftBodyData.ClusterSRHR_CL, InOutBufferCursor, sizeof(SoftBodyData.ClusterSRHR_CL));
+            ReadBuffer(&SoftBodyData.ClusterSKHR_CL, InOutBufferCursor, sizeof(SoftBodyData.ClusterSKHR_CL));
+            ReadBuffer(&SoftBodyData.ClusterSSHR_CL, InOutBufferCursor, sizeof(SoftBodyData.ClusterSSHR_CL));
+            ReadBuffer(&SoftBodyData.ClusterSR_SPLT_CL, InOutBufferCursor, sizeof(SoftBodyData.ClusterSR_SPLT_CL));
+            ReadBuffer(&SoftBodyData.ClusterSK_SPLT_CL, InOutBufferCursor, sizeof(SoftBodyData.ClusterSK_SPLT_CL));
+            ReadBuffer(&SoftBodyData.ClusterSS_SPLT_CL, InOutBufferCursor, sizeof(SoftBodyData.ClusterSS_SPLT_CL));
+            ReadBuffer(&SoftBodyData.InterationV_IT, InOutBufferCursor, sizeof(SoftBodyData.InterationV_IT));
+            ReadBuffer(&SoftBodyData.InterationP_IT, InOutBufferCursor, sizeof(SoftBodyData.InterationP_IT));
+            ReadBuffer(&SoftBodyData.InterationD_IT, InOutBufferCursor, sizeof(SoftBodyData.InterationD_IT));
+            ReadBuffer(&SoftBodyData.InterationC_IT, InOutBufferCursor, sizeof(SoftBodyData.InterationC_IT));
+            ReadBuffer(&SoftBodyData.MaterialLST, InOutBufferCursor, sizeof(SoftBodyData.MaterialLST));
+            ReadBuffer(&SoftBodyData.MaterialAST, InOutBufferCursor, sizeof(SoftBodyData.MaterialAST));
+            ReadBuffer(&SoftBodyData.MaterialVST, InOutBufferCursor, sizeof(SoftBodyData.MaterialVST));
+
+            ReadBuffer(&SoftBodyData.AnchorRigidbodyCount, InOutBufferCursor, sizeof(SoftBodyData.AnchorRigidbodyCount));
+            SoftBodyData.ArrayAnchorRigidbody = AllocDataArray<SoftBodyData::AnchorRigidbody>(SoftBodyData.AnchorRigidbodyCount);
+            ReadBuffer(SoftBodyData.ArrayAnchorRigidbody, InOutBufferCursor, sizeof(SoftBodyData::AnchorRigidbody)* SoftBodyData.AnchorRigidbodyCount);
+
+            ReadBuffer(&SoftBodyData.VertexPinCount, InOutBufferCursor, sizeof(SoftBodyData.VertexPinCount));
+            SoftBodyData.ArrayVertexPin = AllocDataArray<SoftBodyData::VertexPin>(SoftBodyData.VertexPinCount);
+            ReadBuffer(SoftBodyData.ArrayVertexPin, InOutBufferCursor, sizeof(SoftBodyData::VertexPin) * SoftBodyData.VertexPinCount);
+        }
     }
 }

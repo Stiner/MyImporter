@@ -9,9 +9,11 @@ namespace PMX
 
     typedef char            Int8;
     typedef short           Int16;
+    typedef int             Int32;
 
     typedef unsigned char   UInt8;
     typedef unsigned short  UInt16;
+    typedef unsigned int    UInt32;
 
     typedef size_t          MemSize;
 
@@ -567,5 +569,91 @@ namespace PMX
 
     struct SoftBodyData
     {
+        Text NameLocal;
+        Text NameUniversal;
+
+        enum class ShapeType : Int8
+        {
+            NoN = -1,
+
+            TriMesh,
+            Rope,
+        } Shape = ShapeType::NoN;
+
+        int MaterialIndex = -1;
+
+        UInt8 Group = 0;
+
+        // 비트 마스크. 각 비트 인덱스값이 그룹ID가 됨.
+        // 예) 0001000000000001 라면 그룹ID 값은 4,16.
+        //     4,16 그룹과는 충돌하지 않음.
+        UInt16 NonCollisionGroupMask = 0;
+
+        enum class Flags : UInt8
+        {
+            NoN = 0,
+
+            B_Link           = 1 << 0,
+            ClusterCreation  = 1 << 1,
+            LinkCrossing     = 1 << 2,
+        } Flags = Flags::NoN;
+
+        int B_LinkCreateDistance;
+        int NumberOfClusters;
+        float TotalMass;
+        float CollisionMargin;
+
+        enum class AerodynamicModel : Int32
+        {
+            NoN = -1,
+
+            V_Point,
+            V_TwoSided,
+            V_OneSided,
+            F_TwoSided,
+            F_OneSided,
+        } AerodynamicsModel = AerodynamicModel::NoN;
+
+        float ConfigVCF = 0;         // Velocities correction factor(Baumgarte)
+        float ConfigDP = 0;          // Damping coefficient
+        float ConfigDG = 0;          // Drag coefficient
+        float ConfigLF = 0;          // Lift coefficient
+        float ConfigPR = 0;          // Pressure coefficient
+        float ConfigVC = 0;          // Volume conversation coefficient
+        float ConfigDF = 0;          // Dynamic friction coefficient
+        float ConfigMT = 0;          // Pose matching coefficient
+        float ConfigCHR = 0;         // Rigid contacts hardness
+        float ConfigKHR = 0;         // Kinetic contacts hardness
+        float ConfigSHR = 0;         // Soft contacts hardness
+        float ConfigAHR = 0;         // Anchors hardness
+        float ClusterSRHR_CL = 0;    // Soft vs rigid hardness
+        float ClusterSKHR_CL = 0;    // Soft vs kinetic hardness
+        float ClusterSSHR_CL = 0;    // Soft vs soft hardness
+        float ClusterSR_SPLT_CL = 0; // Soft vs rigid impulse split
+        float ClusterSK_SPLT_CL = 0; // Soft vs kinetic impulse split
+        float ClusterSS_SPLT_CL = 0; // Soft vs soft impulse split
+        int InterationV_IT = 0;      // Velocities solver iterations
+        int InterationP_IT = 0;      // Positions solver iterations
+        int InterationD_IT = 0;      // Drift solver iterations
+        int InterationC_IT = 0;      // Cluster solver iterations
+        int MaterialLST = 0;         // Linear stiffness coefficient
+        int MaterialAST = 0;         // Area / Angular stiffness coefficient
+        int MaterialVST = 0;         // Volume stiffness coefficient
+
+        int AnchorRigidbodyCount = 0;   // How many anchoring rigid bodies there are
+
+        struct AnchorRigidbody
+        {
+            int RigidbodyIndex;
+            int VertexIndex;
+            UInt8 NearMode;
+        }* ArrayAnchorRigidbody = nullptr;
+
+        int VertexPinCount = 0;
+
+        struct VertexPin
+        {
+            int VertexIndex;
+        }* ArrayVertexPin = nullptr;
     };
 }
