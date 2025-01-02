@@ -39,8 +39,11 @@ namespace PMX
     template <class T>
     T* AllocDataArray(int Size)
     {
+        if (Size <= 0)
+            return nullptr;
+
         T* Array = new T[Size];
-        return reinterpret_cast<T>(memset(Array, 0, sizeof(T) * Size));
+        return reinterpret_cast<T*>(memset(Array, 0, sizeof(T) * Size));
     }
 
     PMXMeshData::~PMXMeshData()
