@@ -38,34 +38,34 @@ namespace PMX
 
         ModelInfo ModelInfoData;
 
-        int VertexCount;
+        int VertexCount = 0;
         VertexData* ArrayVertex = nullptr;
 
-        int SurfaceCount;
+        int SurfaceCount = 0;
         SurfaceData* ArraySurface = nullptr;
 
-        int TextureCount;
+        int TextureCount = 0;
         TextureData* ArrayTexture = nullptr;
 
-        int MaterialCount;
+        int MaterialCount = 0;
         MaterialData* ArrayMaterial = nullptr;
 
-        int BoneCount;
+        int BoneCount = 0;
         BoneData* ArrayBone = nullptr;
 
-        int MorphCount;
+        int MorphCount = 0;
         MorphData* ArrayMorph = nullptr;
 
-        int DisplayFrameCount;
+        int DisplayFrameCount = 0;
         DisplayFrameData* ArrayDisplayFrame = nullptr;
 
-        int RigidbodyCount;
+        int RigidbodyCount = 0;
         RigidbodyData* ArrayRigidbody = nullptr;
 
-        int JointCount;
+        int JointCount = 0;
         JointData* ArrayJoint = nullptr;
 
-        int SoftBodyCount;
+        int SoftBodyCount = 0;
         SoftBodyData* ArraySoftBody = nullptr;
     };
 }
