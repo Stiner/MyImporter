@@ -57,33 +57,58 @@ namespace PMX
             return false;
 
         const Byte* BufferCur = InBuffer;
+        const Byte* BufferEnd = InBuffer + InBufferSize;
 
         ReadHeader(BufferCur);
 
         if (IsValidPMXFile(HeaderData) == false)
             return false;
+        if (BufferCur == BufferEnd)
+            return true;
 
         ReadModelInfo(BufferCur);
+        if (BufferCur == BufferEnd)
+            return true;
 
         ReadVertices(BufferCur);
+        if (BufferCur == BufferEnd)
+            return true;
 
         ReadSurfaces(BufferCur);
+        if (BufferCur == BufferEnd)
+            return true;
 
         ReadTextures(BufferCur);
+        if (BufferCur == BufferEnd)
+            return true;
 
         ReadMaterials(BufferCur);
+        if (BufferCur == BufferEnd)
+            return true;
 
         ReadBones(BufferCur);
+        if (BufferCur == BufferEnd)
+            return true;
 
         ReadMorphs(BufferCur);
+        if (BufferCur == BufferEnd)
+            return true;
 
         ReadDisplayFrames(BufferCur);
+        if (BufferCur == BufferEnd)
+            return true;
 
         ReadRigidbodies(BufferCur);
+        if (BufferCur == BufferEnd)
+            return true;
 
         ReadJoints(BufferCur);
+        if (BufferCur == BufferEnd)
+            return true;
 
         ReadSoftBodies(BufferCur);
+        if (BufferCur == BufferEnd)
+            return true;
 
         // 지금까지 잘 로드 했는지 검사
         if (InBuffer != BufferCur - InBufferSize)
