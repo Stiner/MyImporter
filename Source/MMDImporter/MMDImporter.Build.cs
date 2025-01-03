@@ -16,6 +16,7 @@ public class MMDImporter : ModuleRules
 
         PrivateIncludePaths.AddRange(
             new string[] {
+                "MMDImporter",
             }
             );
 
