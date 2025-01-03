@@ -589,7 +589,7 @@ namespace PMX
 
         ArrayDisplayFrame = AllocDataArray<DisplayFrameData>(DisplayFrameCount);
 
-        for (int i = 0, max = DisplayFrameCount; i < max; ++i)
+        for (int i = 0; i < DisplayFrameCount; ++i)
         {
             DisplayFrameData& DisplayFrameData = ArrayDisplayFrame[i];
 
@@ -605,7 +605,7 @@ namespace PMX
                 DisplayFrameData.ArrayFrame = new DisplayFrameData::Frame[DisplayFrameData.FrameCount];
                 memset(DisplayFrameData.ArrayFrame, 0, sizeof(DisplayFrameData::Frame) * DisplayFrameData.FrameCount);
 
-                for (int j = 0, max = DisplayFrameData.FrameCount; j < max; ++j)
+                for (int j = 0; j < DisplayFrameData.FrameCount; ++j)
                 {
                     DisplayFrameData::Frame& FrameData = DisplayFrameData.ArrayFrame[j];
 
