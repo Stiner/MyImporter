@@ -63,55 +63,25 @@ namespace PMX
 
         if (IsValidPMXFile(HeaderData) == false)
             return false;
-        if (BufferCur == BufferEnd)
-            return true;
 
         ReadModelInfo(BufferCur);
-        if (BufferCur == BufferEnd)
-            return true;
-
         ReadVertices(BufferCur);
-        if (BufferCur == BufferEnd)
-            return true;
-
         ReadSurfaces(BufferCur);
-        if (BufferCur == BufferEnd)
-            return true;
-
         ReadTextures(BufferCur);
-        if (BufferCur == BufferEnd)
-            return true;
-
         ReadMaterials(BufferCur);
-        if (BufferCur == BufferEnd)
-            return true;
-
         ReadBones(BufferCur);
-        if (BufferCur == BufferEnd)
-            return true;
-
         ReadMorphs(BufferCur);
-        if (BufferCur == BufferEnd)
-            return true;
-
         ReadDisplayFrames(BufferCur);
-        if (BufferCur == BufferEnd)
-            return true;
-
         ReadRigidbodies(BufferCur);
-        if (BufferCur == BufferEnd)
-            return true;
-
         ReadJoints(BufferCur);
-        if (BufferCur == BufferEnd)
-            return true;
 
-        ReadSoftBodies(BufferCur);
-        if (BufferCur == BufferEnd)
-            return true;
+        if (HeaderData.Version > 2.0f)
+        {
+            ReadSoftBodies(BufferCur);
+        }
 
-        // 지금까지 잘 로드 했는지 검사
-        if (InBuffer != BufferCur - InBufferSize)
+        // 끝까지 정상적으로 읽었는지 검사
+        if (BufferCur != BufferEnd)
         {
             Delete();
             return false;
